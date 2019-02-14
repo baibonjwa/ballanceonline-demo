@@ -117,7 +117,7 @@ function initCannon() {
   var groundBody = new CANNON.Body({
     mass: 0 // mass == 0 makes the body static
   });
-  var groundShape = new CANNON.Plane();
+  var groundShape = new CANNON.Box(new CANNON.Vec3(2, 1.5, -0.1));
   groundBody.addShape(groundShape);
   world.addBody(groundBody);
 
