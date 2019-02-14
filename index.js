@@ -82,16 +82,16 @@ function initThree() {
 
 function initCannon() {
   world = new CANNON.World();
-  world.gravity.set(0,0,0);
-  // world.gravity.set(0,0,-);
+  // world.gravity.set(0,0,0);
+  world.gravity.set(0,0,-9.8);
   world.broadphase = new CANNON.NaiveBroadphase();
   world.solver.iterations = 10;
-  shape = new CANNON.Box(new CANNON.Vec3(1,1,1));
+  shape = new CANNON.Box(new CANNON.Vec3(0.2,0.2,0.2));
   // mass = 1;
   body = new CANNON.Body({
     mass: 1
   });
-  body.position.set(0, 0, 0.1)
+  body.position.set(0, 0, 1)
   body.addShape(shape);
   // body.angularVelocity.set(10,10,10);
   // body.angularDamping = 0.5;
@@ -114,12 +114,12 @@ function initCannon() {
   // }
 
   // Create a plane
-  // var groundBody = new CANNON.Body({
-  //   mass: 0 // mass == 0 makes the body static
-  // });
-  // var groundShape = new CANNON.Plane();
-  // groundBody.addShape(groundShape);
-  // world.addBody(groundBody);
+  var groundBody = new CANNON.Body({
+    mass: 0 // mass == 0 makes the body static
+  });
+  var groundShape = new CANNON.Plane();
+  groundBody.addShape(groundShape);
+  world.addBody(groundBody);
 
   // Create the heightfield
   // var hfShape = new CANNON.Heightfield(matrix, {
