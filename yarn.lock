@@ -1136,6 +1136,11 @@ sshpk@^1.7.0:
     safer-buffer "^2.0.2"
     tweetnacl "~0.14.0"
 
+stats-js@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/stats-js/-/stats-js-1.0.0.tgz#2bae33b4ec3c84939e7622a9ed0de1b44254e977"
+  integrity sha512-Qhuj/FgQ0xzmP2/tKTXjJLpkvdy6Eh71CweupNDJjRuUUSeAXP6NLy8yNHtnSY0DsOigh8TdyixyOEzlZVPDOA==
+
 "statuses@>= 1.4.0 < 2":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.5.0.tgz#161c7dac177659fd9811f43771fa99381478628c"
@@ -1206,6 +1211,11 @@ tar@^2.0.0:
     block-stream "*"
     fstream "^1.0.2"
     inherits "2"
+
+three-orbitcontrols@^2.101.1:
+  version "2.101.1"
+  resolved "https://registry.yarnpkg.com/three-orbitcontrols/-/three-orbitcontrols-2.101.1.tgz#5361507eb78b1c509b26a90489456a35a923ec26"
+  integrity sha512-GnTQGh0ULrnCae5doq+AoEnfRvZ5iW46wuYUwwdLpFSufmAa4ar4XGHYdGNIixYSdCGPokmPXLaqf+IaYHlAvg==
 
 three@^0.91.0:
   version "0.91.0"

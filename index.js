@@ -4,12 +4,19 @@ import * as THREE from 'three';
 import {add} from './wow.rs';
 import * as CANNON from 'cannon';
 import hotkeys from 'hotkeys-js';
+import OrbitControls from 'three-orbitcontrols'
+import './CannonDebugRenderer';
+import Stats from 'stats-js';
+
 
 let world, mass, body, shape, timeStep=1/60;
 let camera, scene, renderer;
 let geometry, material, mesh;
 let groundGeometry, groundMaterial, groundMesh;
 let light;
+let controls;
+let cannonDebugRenderer;
+let stats;
 
 initThree();
 initCannon();
@@ -49,6 +56,10 @@ function initThree() {
     camera.position.set(1.5, 1.5, 1.5);
     camera.lookAt( 0, 0, 0 );
 
+
+    let cameraHelper = new THREE.CameraHelper(camera);
+    scene.add(cameraHelper);
+
     var axesHelper = new THREE.AxesHelper( 5 );
     scene.add( axesHelper );
 
@@ -59,6 +70,9 @@ function initThree() {
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    // controls = new OrbitControls( camera );
+    // controls.update();
 
     mesh = new THREE.Mesh( geometry, material );
     scene.add( mesh );
@@ -77,6 +91,11 @@ function initThree() {
 
     document.body.innerHTML = '';
     document.body.appendChild( renderer.domElement );
+
+    stats = new Stats();
+    stats.showPanel(0);
+    document.body.appendChild( stats.dom );
+
     initCannon();
 }
 
@@ -98,6 +117,7 @@ function initCannon() {
   // body.velocity.set(1,0,0);
   body.linearDamping = 0.9;
   world.addBody(body);
+  cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
 
   // create heightfield body
   // var matrix = [];
@@ -134,8 +154,12 @@ function initCannon() {
 
 function animate() {
     requestAnimationFrame( animate );
+    stats.begin();
     updatePhysics();
+    cannonDebugRenderer.update();
+    // controls.update();
     renderer.render( scene, camera );
+    stats.end();
 }
 
 function updatePhysics() {
