@@ -1254,6 +1254,11 @@ three-orbitcontrols@^2.101.1:
   resolved "https://registry.yarnpkg.com/three-orbitcontrols/-/three-orbitcontrols-2.101.1.tgz#5361507eb78b1c509b26a90489456a35a923ec26"
   integrity sha512-GnTQGh0ULrnCae5doq+AoEnfRvZ5iW46wuYUwwdLpFSufmAa4ar4XGHYdGNIixYSdCGPokmPXLaqf+IaYHlAvg==
 
+three-to-cannon@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/three-to-cannon/-/three-to-cannon-2.0.0.tgz#725e640908305b69cab9a5d731f923ef3c68383a"
+  integrity sha512-vXQT8aHZwnSiJrM7Qj5hu11Cz+T04wnDq2I8RHiRogXJlu7PoJkHBSOrUaP2oZ3kxf+kkw7Bcps2REBwse30SA==
+
 three@^0.91.0:
   version "0.91.0"
   resolved "https://registry.yarnpkg.com/three/-/three-0.91.0.tgz#033fe745b64e56e679a86581957cfd1c5f9fe284"

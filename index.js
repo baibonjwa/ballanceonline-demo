@@ -8,6 +8,8 @@ import OrbitControls from 'three-orbitcontrols'
 import './CannonDebugRenderer';
 import './GLTFLoader';
 import Stats from 'stats-js';
+// import threeToCannon from 'three-to-cannon';
+// let threeToCannon = require('three-to-cannon').threeToCannon;
 
 
 let world, mass, body, shape, timeStep=1/60;
@@ -18,6 +20,7 @@ let light;
 let controls;
 let cannonDebugRenderer;
 let stats;
+let duckShape;
 
 initThree();
 initCannon();
@@ -108,11 +111,17 @@ function initThree() {
 
         scene.add( gltf.scene );
 
+        // console.log(gltf)
+        // duckShape = threeToCannon(gltf.scene.children[0])
+        // console.log(duckShape);
+
         gltf.animations; // Array<THREE.AnimationClip>
         gltf.scene; // THREE.Scene
         gltf.scenes; // Array<THREE.Scene>
         gltf.cameras; // Array<THREE.Camera>
         gltf.asset; // Object
+
+        // initCannon(gltf);
 
       },
       // called while loading is progressing
@@ -125,7 +134,6 @@ function initThree() {
       function ( error ) {
         console.log(error);
         console.log( 'An error happened' );
-
       }
     );
 
@@ -145,6 +153,7 @@ function initCannon() {
   });
   body.position.set(0, 0, 1)
   body.addShape(shape);
+  // body.addShape(duckShape);
   // body.angularVelocity.set(10,10,10);
   // body.angularDamping = 0.5;
   // body.velocity.set(1,0,0);
