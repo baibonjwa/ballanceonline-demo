@@ -15,5 +15,11 @@
   },
   "scripts": {
     "start": "node start.js"
+  },
+  "devDependencies": {
+    "parcel-plugin-static-files-copy": "^2.0.0"
+  },
+  "staticFiles": {
+    "staticPath": "public"
   }
 }

@@ -6,6 +6,7 @@ import * as CANNON from 'cannon';
 import hotkeys from 'hotkeys-js';
 import OrbitControls from 'three-orbitcontrols'
 import './CannonDebugRenderer';
+import './GLTFLoader';
 import Stats from 'stats-js';
 
 
@@ -95,6 +96,38 @@ function initThree() {
     stats = new Stats();
     stats.showPanel(0);
     document.body.appendChild( stats.dom );
+
+    var loader = new THREE.GLTFLoader()
+
+    // Load a glTF resource
+    loader.load(
+      // resource URL
+      '/models/gltf/Duck/Duck.gltf',
+      // called when the resource is loaded
+      function ( gltf ) {
+
+        scene.add( gltf.scene );
+
+        gltf.animations; // Array<THREE.AnimationClip>
+        gltf.scene; // THREE.Scene
+        gltf.scenes; // Array<THREE.Scene>
+        gltf.cameras; // Array<THREE.Camera>
+        gltf.asset; // Object
+
+      },
+      // called while loading is progressing
+      function ( xhr ) {
+
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+      },
+      // called when loading has errors
+      function ( error ) {
+        console.log(error);
+        console.log( 'An error happened' );
+
+      }
+    );
 
     initCannon();
 }
