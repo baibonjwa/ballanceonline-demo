@@ -4,9 +4,9 @@ import * as THREE from 'three';
 import {add} from './wow.rs';
 import * as CANNON from 'cannon';
 import hotkeys from 'hotkeys-js';
-import OrbitControls from 'three-orbitcontrols'
 import './CannonDebugRenderer';
 import './GLTFLoader';
+import './OrbitControls';
 import Stats from 'stats-js';
 // import threeToCannon from 'three-to-cannon';
 // let threeToCannon = require('three-to-cannon').threeToCannon;
@@ -29,25 +29,25 @@ animate();
 hotkeys('d,right', (event, handler) => {
   // Prevent the default refresh event under WINDOWS system
   event.preventDefault()
-  body.velocity.set(1,0,0);
+  body.velocity.set(2,0,0);
 });
 
 hotkeys('a,left', (event, handler) => {
   // Prevent the default refresh event under WINDOWS system
   event.preventDefault()
-  body.velocity.set(-1,0,0);
+  body.velocity.set(-2,0,0);
 });
 
 hotkeys('w,up', (event, handler) => {
   // Prevent the default refresh event under WINDOWS system
   event.preventDefault()
-  body.velocity.set(0,1,0);
+  body.velocity.set(0,2,0);
 });
 
 hotkeys('s,down', (event, handler) => {
   // Prevent the default refresh event under WINDOWS system
   event.preventDefault()
-  body.velocity.set(0,-1,0);
+  body.velocity.set(0,-2,0);
 });
 
 function initThree() {
@@ -75,8 +75,8 @@ function initThree() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    // controls = new OrbitControls( camera );
-    // controls.update();
+    controls = new THREE.OrbitControls( camera );
+    controls.update();
 
     mesh = new THREE.Mesh( geometry, material );
     scene.add( mesh );
@@ -121,6 +121,7 @@ function initThree() {
         gltf.cameras; // Array<THREE.Camera>
         gltf.asset; // Object
 
+        initCannon();
         // initCannon(gltf);
 
       },
@@ -137,7 +138,7 @@ function initThree() {
       }
     );
 
-    initCannon();
+    // initCannon();
 }
 
 function initCannon() {
@@ -151,7 +152,7 @@ function initCannon() {
   body = new CANNON.Body({
     mass: 1
   });
-  body.position.set(0, 0, 1)
+  body.position.set(0, 0, 4)
   body.addShape(shape);
   // body.addShape(duckShape);
   // body.angularVelocity.set(10,10,10);
@@ -183,6 +184,8 @@ function initCannon() {
   groundBody.addShape(groundShape);
   world.addBody(groundBody);
 
+  // var 
+
   // Create the heightfield
   // var hfShape = new CANNON.Heightfield(matrix, {
   //   elementSize: 1
@@ -199,7 +202,7 @@ function animate() {
     stats.begin();
     updatePhysics();
     cannonDebugRenderer.update();
-    // controls.update();
+    controls.update();
     renderer.render( scene, camera );
     stats.end();
 }

@@ -11,7 +11,6 @@
     "node-sass": "^4.8.3",
     "stats-js": "^1.0.0",
     "three": "^0.91.0",
-    "three-orbitcontrols": "^2.101.1",
     "three-to-cannon": "^2.0.0"
   },
   "scripts": {

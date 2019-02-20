@@ -1249,11 +1249,6 @@ tar@^2.0.0:
     fstream "^1.0.2"
     inherits "2"
 
-three-orbitcontrols@^2.101.1:
-  version "2.101.1"
-  resolved "https://registry.yarnpkg.com/three-orbitcontrols/-/three-orbitcontrols-2.101.1.tgz#5361507eb78b1c509b26a90489456a35a923ec26"
-  integrity sha512-GnTQGh0ULrnCae5doq+AoEnfRvZ5iW46wuYUwwdLpFSufmAa4ar4XGHYdGNIixYSdCGPokmPXLaqf+IaYHlAvg==
-
 three-to-cannon@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/three-to-cannon/-/three-to-cannon-2.0.0.tgz#725e640908305b69cab9a5d731f923ef3c68383a"
