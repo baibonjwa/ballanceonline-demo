@@ -9,7 +9,7 @@ import './GLTFLoader';
 import './OrbitControls';
 import Stats from 'stats-js';
 // import threeToCannon from 'three-to-cannon';
-// let threeToCannon = require('three-to-cannon').threeToCannon;
+let threeToCannon = require('three-to-cannon').threeToCannon;
 
 
 let world, mass, body, shape, timeStep=1/60;
@@ -20,11 +20,63 @@ let light;
 let controls;
 let cannonDebugRenderer;
 let stats;
-let duckShape;
+let duckMesh, duckShape, duckBody;
 
-initThree();
-initCannon();
-animate();
+
+var loader = new THREE.GLTFLoader()
+
+// Load a glTF resource
+loader.load(
+  // resource URL
+  '/models/gltf/Duck/Duck.gltf',
+  // called when the resource is loaded
+  function ( gltf ) {
+
+    initThree();
+
+    // console.log(gltf)
+    // duckMesh = gltf.scene.children[0].children[1];
+    duckMesh = gltf.scene.children[0];
+    duckMesh.translateX(-10)
+    duckMesh.translateY(-10)
+    duckMesh.translateZ(-10)
+    // duckMesh.up.set(new THREE.Vector3(0, 0, 1));
+    // duckMesh.up.set(0, 0, 1);
+    // duckMesh.rotateX(90)
+    // duckMesh.rotateY(90)
+    // duckMesh.rotation.set(new THREE.Vector3(0, 0, 1));
+    // duckMesh.position.set(new THREE.Vector3(0, 0, 1));
+    console.log(duckMesh);
+    // duckShape = new THREE.Box3().setFromObject(duckMesh);
+    duckShape = threeToCannon(duckMesh, {type: threeToCannon.Type.Box});
+    // duckShape.offset.set(0,0,0);
+    // duckShape.halfExtents.set(1, 1, 1);
+    console.log(duckShape);
+    // console.log(duckShape);
+
+    scene.add( gltf.scene );
+    scene.add( duckMesh );
+
+    gltf.animations; // Array<THREE.AnimationClip>
+    gltf.scene; // THREE.Scene
+    gltf.scenes; // Array<THREE.Scene>
+    gltf.cameras; // Array<THREE.Camera>
+    gltf.asset; // Object
+
+    initCannon();
+    animate();
+    // initCannon(gltf);
+  },
+  // called while loading is progressing
+  function ( xhr ) {
+    console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+  },
+  // called when loading has errors
+  function ( error ) {
+    console.log(error);
+    console.log( 'An error happened' );
+  }
+);
 
 hotkeys('d,right', (event, handler) => {
   // Prevent the default refresh event under WINDOWS system
@@ -70,7 +122,7 @@ function initThree() {
     geometry = new THREE.BoxGeometry( 0.2, 0.2, 0.2 );
     material = new THREE.MeshNormalMaterial();
 
-    renderer = new THREE.WebGLRenderer( { antialias: true } );
+    renderer = new THREE.WebGLRenderer( { antialias: false } );
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -100,45 +152,6 @@ function initThree() {
     stats.showPanel(0);
     document.body.appendChild( stats.dom );
 
-    var loader = new THREE.GLTFLoader()
-
-    // Load a glTF resource
-    loader.load(
-      // resource URL
-      '/models/gltf/Duck/Duck.gltf',
-      // called when the resource is loaded
-      function ( gltf ) {
-
-        scene.add( gltf.scene );
-
-        // console.log(gltf)
-        // duckShape = threeToCannon(gltf.scene.children[0])
-        // console.log(duckShape);
-
-        gltf.animations; // Array<THREE.AnimationClip>
-        gltf.scene; // THREE.Scene
-        gltf.scenes; // Array<THREE.Scene>
-        gltf.cameras; // Array<THREE.Camera>
-        gltf.asset; // Object
-
-        initCannon();
-        // initCannon(gltf);
-
-      },
-      // called while loading is progressing
-      function ( xhr ) {
-
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-      },
-      // called when loading has errors
-      function ( error ) {
-        console.log(error);
-        console.log( 'An error happened' );
-      }
-    );
-
-    // initCannon();
 }
 
 function initCannon() {
@@ -147,20 +160,29 @@ function initCannon() {
   world.gravity.set(0,0,-9.8);
   world.broadphase = new CANNON.NaiveBroadphase();
   world.solver.iterations = 10;
-  shape = new CANNON.Box(new CANNON.Vec3(0.2,0.2,0.2));
+  shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.1, 0.1));
   // mass = 1;
   body = new CANNON.Body({
     mass: 1
   });
   body.position.set(0, 0, 4)
   body.addShape(shape);
-  // body.addShape(duckShape);
+
   // body.angularVelocity.set(10,10,10);
   // body.angularDamping = 0.5;
   // body.velocity.set(1,0,0);
   body.linearDamping = 0.9;
   world.addBody(body);
-  cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
+
+  duckBody = new CANNON.Body({
+    mass: 10
+  })
+  console.log(duckShape);
+
+  duckBody.addShape(duckShape);
+  duckBody.position.set(0, 0, 5);
+  console.log(duckBody);
+  world.addBody(duckBody);
 
   // create heightfield body
   // var matrix = [];
@@ -180,10 +202,11 @@ function initCannon() {
   var groundBody = new CANNON.Body({
     mass: 0 // mass == 0 makes the body static
   });
-  var groundShape = new CANNON.Box(new CANNON.Vec3(2, 1.5, -0.1));
+  var groundShape = new CANNON.Box(new CANNON.Vec3(2, 1.5, 0.00000000001));
   groundBody.addShape(groundShape);
   world.addBody(groundBody);
 
+  cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
   // var 
 
   // Create the heightfield
@@ -199,12 +222,12 @@ function initCannon() {
 
 function animate() {
     requestAnimationFrame( animate );
-    stats.begin();
-    updatePhysics();
+    // stats.begin();
     cannonDebugRenderer.update();
     controls.update();
     renderer.render( scene, camera );
-    stats.end();
+    updatePhysics();
+    // stats.end();
 }
 
 function updatePhysics() {
@@ -213,6 +236,10 @@ function updatePhysics() {
   // Copy coordinates from Cannon.js to Three.js
   mesh.position.copy(body.position);
   mesh.quaternion.copy(body.quaternion);
+
+  duckMesh.position.copy(duckBody.position);
+  duckMesh.quaternion.copy(duckBody.quaternion);
+
 }
 
 window.addEventListener( 'resize', onWindowResize, false );
