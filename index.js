@@ -37,9 +37,7 @@ loader.load(
     // console.log(gltf)
     // duckMesh = gltf.scene.children[0].children[1];
     duckMesh = gltf.scene.children[0];
-    duckMesh.translateX(-10)
-    duckMesh.translateY(-10)
-    duckMesh.translateZ(-10)
+    duckMesh.position.set(0, 0, 4);
     // duckMesh.up.set(new THREE.Vector3(0, 0, 1));
     // duckMesh.up.set(0, 0, 1);
     // duckMesh.rotateX(90)
@@ -208,6 +206,8 @@ function initCannon() {
 
   cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
   // var 
+  duckBody.position.copy(duckMesh.position)
+  duckBody.quaternion.copy(duckMesh.quaternion)
 
   // Create the heightfield
   // var hfShape = new CANNON.Heightfield(matrix, {
