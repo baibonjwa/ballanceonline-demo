@@ -10,8 +10,7 @@
     "mime-types": "2.1.18",
     "node-sass": "^4.8.3",
     "stats-js": "^1.0.0",
-    "three": "^0.91.0",
-    "three-to-cannon": "^2.0.0"
+    "three": "^0.91.0"
   },
   "scripts": {
     "start": "node start.js"

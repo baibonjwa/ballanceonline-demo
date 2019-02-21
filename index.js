@@ -8,8 +8,9 @@ import './CannonDebugRenderer';
 import './GLTFLoader';
 import './OrbitControls';
 import Stats from 'stats-js';
+import { threeToCannon, Type } from './threetoCannon';
 // import threeToCannon from 'three-to-cannon';
-let threeToCannon = require('three-to-cannon').threeToCannon;
+// let threeToCannon = require('three-to-cannon').threeToCannon;
 
 
 let world, mass, body, shape, timeStep=1/60;
@@ -28,7 +29,8 @@ var loader = new THREE.GLTFLoader()
 // Load a glTF resource
 loader.load(
   // resource URL
-  '/models/gltf/Duck/Duck.gltf',
+  // '/models/gltf/Duck/Duck.gltf',
+  '/models/gltf/BoxTextured/BoxTextured.gltf',
   // called when the resource is loaded
   function ( gltf ) {
 
@@ -37,18 +39,18 @@ loader.load(
     // console.log(gltf)
     // duckMesh = gltf.scene.children[0].children[1];
     duckMesh = gltf.scene.children[0];
-    duckMesh.position.set(0, 0, 4);
-    // duckMesh.up.set(new THREE.Vector3(0, 0, 1));
-    // duckMesh.up.set(0, 0, 1);
+    // duckMesh.translateOnAxis(new THREE.Vector3(1, 1, 4))
+    // duckMesh.translateOnAxis(1)
+    // duckMesh.translateY(1)
+    // duckMesh.translateZ(4)
+    duckMesh.position.set(0, 0, 2);
     // duckMesh.rotateX(90)
     // duckMesh.rotateY(90)
     // duckMesh.rotation.set(new THREE.Vector3(0, 0, 1));
-    // duckMesh.position.set(new THREE.Vector3(0, 0, 1));
+    // duckMesh.position.set((0, 0, 1));
     console.log(duckMesh);
-    // duckShape = new THREE.Box3().setFromObject(duckMesh);
-    duckShape = threeToCannon(duckMesh, {type: threeToCannon.Type.Box});
-    // duckShape.offset.set(0,0,0);
-    // duckShape.halfExtents.set(1, 1, 1);
+    // duckShape = threeToCannon(duckMesh, { type: Type.BOX });
+    duckShape = threeToCannon(duckMesh);
     console.log(duckShape);
     // console.log(duckShape);
 
@@ -132,7 +134,7 @@ function initThree() {
     scene.add( mesh );
     // mesh.position.set(100, 100, 100)
 
-    groundGeometry = new THREE.PlaneGeometry(4, 3, 1, 1);
+    groundGeometry = new THREE.BoxGeometry(4, 3, 0.000001);
     groundMaterial = new THREE.MeshLambertMaterial({ color: 0x00ffff });
     // groundMaterial = new THREE.MeshNormalMaterial();
     groundMesh = new THREE.Mesh( groundGeometry, groundMaterial );
@@ -158,7 +160,8 @@ function initCannon() {
   world.gravity.set(0,0,-9.8);
   world.broadphase = new CANNON.NaiveBroadphase();
   world.solver.iterations = 10;
-  shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.1, 0.1));
+  shape = threeToCannon(mesh);
+  // shape = new CANNON.Box(new CANNON.Vec3(0.1, 0.1, 0.1));
   // mass = 1;
   body = new CANNON.Body({
     mass: 1
@@ -173,7 +176,7 @@ function initCannon() {
   world.addBody(body);
 
   duckBody = new CANNON.Body({
-    mass: 10
+    mass: 4
   })
   console.log(duckShape);
 
@@ -200,7 +203,8 @@ function initCannon() {
   var groundBody = new CANNON.Body({
     mass: 0 // mass == 0 makes the body static
   });
-  var groundShape = new CANNON.Box(new CANNON.Vec3(2, 1.5, 0.00000000001));
+  // var groundShape = new CANNON.Box(new CANNON.Vec3(2, 1.5, 0.00000000001));
+  var groundShape = threeToCannon(groundMesh);
   groundBody.addShape(groundShape);
   world.addBody(groundBody);
 
