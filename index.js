@@ -158,7 +158,7 @@ function initThree() {
     var axesHelper = new THREE.AxesHelper( 100 );
     scene.add( axesHelper );
 
-    geometry = new THREE.SphereGeometry( 3 );
+    geometry = new THREE.SphereGeometry( 3, 100, 100 );
     material = new THREE.MeshNormalMaterial();
 
     renderer = new THREE.WebGLRenderer( { antialias: false } );
