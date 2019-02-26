@@ -107,7 +107,6 @@ function createBoundingBoxShape (object) {
 
   box.setFromObject(clone);
 
-  console.log(box);
   if (!isFinite(box.min.lengthSq())) return null;
 
   shape = new CANNON.Box(new CANNON.Vec3(
@@ -117,12 +116,10 @@ function createBoundingBoxShape (object) {
   ));
 
   localPosition = box.translate(clone.position.negate()).getCenter(new THREE.Vector3());
-  console.log(localPosition);
-  console.log(localPosition.lengthSq())
   shape.offset = new THREE.Vector3(-1, -1, -1);
-  // if (localPosition.lengthSq()) {
-  //   shape.offset = localPosition;
-  // }
+  if (localPosition.lengthSq()) {
+    shape.offset = localPosition;
+  }
 
   return shape;
 }
@@ -372,6 +369,5 @@ function getMeshes (object) {
       meshes.push(o);
     }
   });
-  console.log(meshes);
   return meshes;
 }

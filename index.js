@@ -8,22 +8,22 @@ import './CannonDebugRenderer';
 import './GLTFLoader';
 import './OBJLoader';
 import './OrbitControls';
+import './TrackballControls';
+import './MapControls';
 import './MTLLoader';
 import Stats from 'stats-js';
-import { threeToCannon, Type } from './threetoCannon';
-// import threeToCannon from 'three-to-cannon';
-// let threeToCannon = require('three-to-cannon').threeToCannon;
+import { threeToCannon } from './threetoCannon';
 
 
 let world, mass, body, shape, timeStep=1/60;
 let camera, scene, renderer;
 let geometry, material, mesh;
-let groundGeometry, groundMaterial, groundMesh;
 let light;
 let controls;
 let cannonDebugRenderer;
 let stats;
-// let duckMesh, duckShape, duckBody;
+let ball;
+let bodies = [];
 
 
 // var loader = new THREE.GLTFLoader()
@@ -43,12 +43,27 @@ mtlLoader.load( 'level1.mtl', function( materials ) {
 
       initThree();
       console.log(obj);
-      obj.position.set(0, 0, 0);
-      // obj.scale.set(0.1, 0,1, 0.1);
-      // camera.target.position.copy(obj);
-
       scene.add( obj );
-      // scene.add( duckMesh );
+      ball = obj.children.find((mesh) => {
+        return mesh.name === "objP_Ball_Wood_04"
+      });
+      console.log(ball);
+      controls.target = ball.position;
+
+      // obj.children.forEach((child) => {
+      //   // let vector = new THREE.Vector3();
+      //   child.geometry.computeBoundingSphere();
+      //   var vector = child.geometry.boundingSphere.center;
+      //   // child.updateMatrixWorld();
+      //   // vector.setFromMatrixPosition( child.matrixWorld );
+      //   console.log(vector);
+      //   console.log(child.getWorldPosition())
+      // })
+
+      // ball.geometry.computeBoundingSphere();
+      // camera.lookAt(initialBall.geometry.boundingSphere.center);
+      // console.log('init ball', initialBall.geometry.boundingSphere.center)
+      // console.log(camera);
 
       // obj.animations; // Array<THREE.AnimationClip>
       // obj.scene; // THREE.Scene
@@ -78,34 +93,63 @@ mtlLoader.load( 'level1.mtl', function( materials ) {
 hotkeys('d,right', (event, handler) => {
   // Prevent the default refresh event under WINDOWS system
   event.preventDefault()
-  body.velocity.set(20,0,0);
+  body.velocity.set(0, 0, 20);
+  camera.position.set(body.position.x - 20, body.position.y + 40, body.position.z)
+  controls.target = new THREE.Vector3(
+    body.position.x,
+    body.position.y,
+    body.position.z
+  )
 });
 
 hotkeys('a,left', (event, handler) => {
   // Prevent the default refresh event under WINDOWS system
   event.preventDefault()
-  body.velocity.set(-20,0,0);
+  body.velocity.set(0, 0, -20);
+  camera.position.set(body.position.x - 20, body.position.y + 40, body.position.z)
+  controls.target = new THREE.Vector3(
+    body.position.x,
+    body.position.y,
+    body.position.z
+  )
 });
 
 hotkeys('w,up', (event, handler) => {
   // Prevent the default refresh event under WINDOWS system
   event.preventDefault()
-  body.velocity.set(0,20,0);
+  body.velocity.set(20, 0, 0);
+  camera.position.set(body.position.x - 20, body.position.y + 40, body.position.z)
+  controls.target = new THREE.Vector3(
+    body.position.x,
+    body.position.y,
+    body.position.z
+  )
 });
 
 hotkeys('s,down', (event, handler) => {
   // Prevent the default refresh event under WINDOWS system
   event.preventDefault()
-  body.velocity.set(0,-20,0);
+  body.velocity.set(-20, 0, 0);
+  camera.position.set(body.position.x - 20, body.position.y + 40, body.position.z)
+  controls.target = new THREE.Vector3(
+    body.position.x,
+    body.position.y,
+    body.position.z
+  )
 });
+
+hotkeys('shift+a', (event, handler) => {
+  console.log('camera');
+  // camera.rotation.y += 90 * Math.PI / 180
+})
 
 function initThree() {
 
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
-    // camera.position.set(0, 30, 0);
-    camera.position.set(0, 50, 240);
+    // camera.position.set(0, 0, 0);
+    // camera.position.set(30, 20, 170);
 
 
     let cameraHelper = new THREE.CameraHelper(camera);
@@ -123,6 +167,7 @@ function initThree() {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     controls = new THREE.OrbitControls( camera );
+    // controls.enableKeys = false;
     controls.update();
 
     mesh = new THREE.Mesh( geometry, material );
@@ -157,15 +202,42 @@ function initCannon() {
   body = new CANNON.Body({
     mass: 1
   });
-  body.position.set(50, 0, 150)
+
+  let initPos = new THREE.Vector3(50, 30, 152);
+  camera.position.set(initPos.x - 20, initPos.y + 40, initPos.z)
+  // camera.rotation.y += 90 * Math.PI / 180
+  controls.target = initPos;
+  body.position.set(initPos.x, initPos.y, initPos.z);
+  console.log('body', body);
+  console.log('controls', controls)
   body.addShape(shape);
-  // camera.position.set(body.position)
+  // camera.position.set(
+  //   ball.geometry.boundingSphere.center
+  // )
 
   // body.angularVelocity.set(10,10,10);
   // body.angularDamping = 0.5;
   // body.velocity.set(1,0,0);
   body.linearDamping = 0.9;
   world.addBody(body);
+
+  console.log(scene);
+  scene.children[4].children.forEach((child) => {
+    let shape = threeToCannon(child)
+    let body = new CANNON.Body({ mass: 0 });
+    // console.log('p', ild.getP())
+    console.log('shape', shape)
+    body.position.set(
+      shape.offset.x,
+      shape.offset.y,
+      shape.offset.z,
+    )
+    console.log(body);
+    body.addShape(shape);
+    body.linearDamping = 0.9;
+    bodies.push({ uuid: child.uuid, body })
+    world.addBody(body);
+  })
 
   // Create a plane
   // var groundBody = new CANNON.Body({
@@ -176,13 +248,13 @@ function initCannon() {
   // groundBody.addShape(groundShape);
   // world.addBody(groundBody);
 
-  cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
+  // cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
 }
 
 function animate() {
     requestAnimationFrame( animate );
     // stats.begin();
-    cannonDebugRenderer.update();
+    // cannonDebugRenderer.update();
     controls.update();
     renderer.render( scene, camera );
     updatePhysics();
@@ -195,6 +267,14 @@ function updatePhysics() {
   // Copy coordinates from Cannon.js to Three.js
   mesh.position.copy(body.position);
   mesh.quaternion.copy(body.quaternion);
+
+  scene.children[4].children.forEach((child) => {
+    let body = bodies.find((obj) => {
+      return obj.uuid === child.uuid
+    })
+    // child.position.copy(body.body.position)
+    // child.quaternion.copy(body.body.quaternion)
+  })
 
   // duckMesh.position.copy(duckBody.position);
   // duckMesh.quaternion.copy(duckBody.quaternion);
