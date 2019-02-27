@@ -13,6 +13,7 @@ import './MapControls';
 import './MTLLoader';
 import Stats from 'stats-js';
 import { threeToCannon } from './threetoCannon';
+import * as TWEEN from '@tweenjs/tween.js';
 
 
 let world, mass, body, shape, timeStep=1/60;
@@ -24,6 +25,7 @@ let cannonDebugRenderer;
 let stats;
 let ball;
 let bodies = [];
+let tween;
 
 
 // var loader = new THREE.GLTFLoader()
@@ -94,48 +96,49 @@ hotkeys('d,right', (event, handler) => {
   // Prevent the default refresh event under WINDOWS system
   event.preventDefault()
   body.velocity.set(0, 0, 20);
-  camera.position.set(body.position.x - 20, body.position.y + 40, body.position.z)
-  controls.target = new THREE.Vector3(
-    body.position.x,
-    body.position.y,
-    body.position.z
-  )
+
+  // let position = {
+  //   x: body.position.x - 20,
+  //   y: body.position.y + 40,
+  //   z: body.position.z,
+  // }
+  // let target = {
+  //   x: body.position.x - 20,
+  //   y: body.position.y + 40,
+  //   z: body.position.z,
+  // }
+  // var tween = new TWEEN.Tween(position).to(target, 0.1);
+  // tween.onUpdate(function() {
+  //   // camera.position.set(body.position.x - 20, body.position.y + 40, body.position.z)
+  //   camera.position.set(position.x, position.y, position.z)
+  //   console.log(position);
+  // });
+  // tween.start();
+  // tween.update();
+  // camera.position.set(body.position.x - 20, body.position.y + 40, body.position.z)
+  // controls.target = new THREE.Vector3(
+  //   body.position.x,
+  //   body.position.y,
+  //   body.position.z
+  // )
 });
 
 hotkeys('a,left', (event, handler) => {
   // Prevent the default refresh event under WINDOWS system
   event.preventDefault()
   body.velocity.set(0, 0, -20);
-  camera.position.set(body.position.x - 20, body.position.y + 40, body.position.z)
-  controls.target = new THREE.Vector3(
-    body.position.x,
-    body.position.y,
-    body.position.z
-  )
 });
 
 hotkeys('w,up', (event, handler) => {
   // Prevent the default refresh event under WINDOWS system
   event.preventDefault()
   body.velocity.set(20, 0, 0);
-  camera.position.set(body.position.x - 20, body.position.y + 40, body.position.z)
-  controls.target = new THREE.Vector3(
-    body.position.x,
-    body.position.y,
-    body.position.z
-  )
 });
 
 hotkeys('s,down', (event, handler) => {
   // Prevent the default refresh event under WINDOWS system
   event.preventDefault()
   body.velocity.set(-20, 0, 0);
-  camera.position.set(body.position.x - 20, body.position.y + 40, body.position.z)
-  controls.target = new THREE.Vector3(
-    body.position.x,
-    body.position.y,
-    body.position.z
-  )
 });
 
 hotkeys('shift+a', (event, handler) => {
@@ -258,7 +261,18 @@ function animate() {
     controls.update();
     renderer.render( scene, camera );
     updatePhysics();
+    updateCamera();
+    // tween.update();
     // stats.end();
+}
+
+function updateCamera() {
+  camera.position.set(body.position.x - 20, body.position.y + 40, body.position.z)
+  controls.target = new THREE.Vector3(
+    body.position.x,
+    body.position.y,
+    body.position.z
+  )
 }
 
 function updatePhysics() {
