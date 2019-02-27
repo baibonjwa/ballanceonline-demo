@@ -26,7 +26,6 @@ let stats;
 let ball;
 let bodies = [];
 let tween;
-let cameraNotUpdate = false;
 
 
 // var loader = new THREE.GLTFLoader()
@@ -90,6 +89,12 @@ mtlLoader.load( 'level1.mtl', function( materials ) {
   );
 })
 
+let cameraRelativePosition = {
+  x: -20,
+  y: 40,
+  z: 0,
+}
+
 keyboardJS.bind(['d', 'right'], () => {
   body.velocity.set(0, 0, 20);
 });
@@ -107,7 +112,17 @@ keyboardJS.bind(['s', 'down'], () => {
 });
 
 keyboardJS.bind(['space'], () => {
-  camera.position.set(body.position.x, body.position.y + 80, body.position.z)
+  cameraRelativePosition = {
+    x: -0.1,
+    y: 60,
+    z: 0,
+  }
+}, () => {
+  cameraRelativePosition = {
+    x: -20,
+    y: 40,
+    z: 0,
+  }
 });
 
 // hotkeys('space', (event, handler) => {
@@ -271,7 +286,7 @@ function animate() {
 
 function updateCamera() {
   controls.update();
-  camera.position.set(body.position.x - 20, body.position.y + 40, body.position.z)
+  camera.position.set(body.position.x + cameraRelativePosition.x, body.position.y + cameraRelativePosition.y, body.position.z)
   controls.target = new THREE.Vector3(
     body.position.x,
     body.position.y,
