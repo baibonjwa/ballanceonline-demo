@@ -9,12 +9,13 @@ import './GLTFLoader';
 import './OBJLoader';
 import './OrbitControls';
 import './TrackballControls';
+import './FBXLoader';
+import './ColladaLoader';
 import './MapControls';
 import './MTLLoader';
 import Stats from 'stats-js';
 import { threeToCannon } from './threetoCannon';
 import * as TWEEN from '@tweenjs/tween.js';
-
 
 let world, mass, body, shape, timeStep=1/60;
 let camera, scene, renderer;
@@ -29,28 +30,37 @@ let tween;
 
 
 // var loader = new THREE.GLTFLoader()
-var mtlLoader = new THREE.MTLLoader();
-mtlLoader.setPath("/models/obj/level1/");
-mtlLoader.load( 'level1.mtl', function( materials ) {
-  materials.preload();
-  var objLoader = new THREE.OBJLoader()
-  objLoader.setMaterials( materials )
+// var mtlLoader = new THREE.MTLLoader();
+// mtlLoader.setPath("/models/obj/level1/");
+// mtlLoader.load( 'level1.mtl', function( materials ) {
+  // materials.preload();
+  var objLoader = new THREE.OBJLoader();
+  var daeLoader = new THREE.ColladaLoader();
+  var fbxLoader = new THREE.FBXLoader();
+  // objLoader.setMaterials( materials )
   // Load a glTF resource
-  objLoader.load(
+  // objLoader.load(
+    // fbxLoader.load(
+    daeLoader.load(
     // resource URL
     // '/models/gltf/Duck/Duck.gltf',
-    '/models/obj/level1/level1.obj',
+    // '/models/dae/level1.dae',
+    // '/models/dae/temp.dae',
+    '/models/dae/lalala3(1).dae',
+    // '/models/fbx/level1.fbx',
     // called when the resource is loaded
     function ( obj ) {
 
       initThree();
-      console.log(obj);
-      scene.add( obj );
-      ball = obj.children.find((mesh) => {
-        return mesh.name === "objP_Ball_Wood_04"
-      });
-      console.log(ball);
-      controls.target = ball.position;
+      // console.log(obj);
+      console.log(obj.scene);
+      // scene.add( obj );
+      scene.add( obj.scene );
+      // ball = obj.children.find((mesh) => {
+      //   return mesh.name === "objP_Ball_Wood_04"
+      // });
+      // console.log(ball);
+      // controls.target = ball.position;
 
       // obj.children.forEach((child) => {
       //   // let vector = new THREE.Vector3();
@@ -87,7 +97,7 @@ mtlLoader.load( 'level1.mtl', function( materials ) {
       console.log( 'An error happened' );
     }
   );
-})
+// })
 
 let cameraRelativePosition = {
   x: -20,
@@ -226,6 +236,7 @@ function initCannon() {
   });
 
   let initPos = new THREE.Vector3(50, 30, 152);
+  // let initPos = new THREE.Vector3(0, 10, 0);
   camera.position.set(initPos.x - 20, initPos.y + 40, initPos.z)
   // camera.rotation.y += 90 * Math.PI / 180
   controls.target = initPos;
@@ -245,20 +256,33 @@ function initCannon() {
 
   console.log(scene);
   scene.children[4].children.forEach((child) => {
-    let shape = threeToCannon(child)
-    let body = new CANNON.Body({ mass: 0 });
-    // console.log('p', ild.getP())
-    console.log('shape', shape)
-    body.position.set(
-      shape.offset.x,
-      shape.offset.y,
-      shape.offset.z,
-    )
-    console.log(body);
-    body.addShape(shape);
-    body.linearDamping = 0.9;
-    bodies.push({ uuid: child.uuid, body })
-    world.addBody(body);
+
+    console.log('child', child);
+    // if (child.name !== 'objA01_Floor_01_02') return;
+    console.log('child', child.name)
+    child.children.forEach((c) => {
+      // if (c.name == 'Shape_IndexedFaceSet_029') {
+        let shape = threeToCannon(c, {type: threeToCannon.Type.BOX})
+        let body = new CANNON.Body({ mass: 0 });
+        console.log('aaa')
+        body.addShape(shape);
+        body.linearDamping = 0.9;
+        bodies.push({ uuid: c.uuid, body })
+        world.addBody(body);
+      // }
+    })
+
+    // if (child.name == 'Shape_IndexedFaceSet_029') {
+    //   let shape = threeToCannon(child, {type: threeToCannon.Type.HULL})
+    //   let body = new CANNON.Body({ mass: 0 });
+    //   console.log('aaa')
+    //   body.addShape(shape);
+    //   body.linearDamping = 0.9;
+    //   bodies.push({ uuid: child.uuid, body })
+    //   world.addBody(body);
+    // }
+    // if (child.type == 'Mesh') {
+    // }
   })
 
   // Create a plane
@@ -270,13 +294,13 @@ function initCannon() {
   // groundBody.addShape(groundShape);
   // world.addBody(groundBody);
 
-  // cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
+  cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
 }
 
 function animate() {
     requestAnimationFrame( animate );
     // stats.begin();
-    // cannonDebugRenderer.update();
+    cannonDebugRenderer.update();
     renderer.render( scene, camera );
     updatePhysics();
     updateCamera();
@@ -302,11 +326,13 @@ function updatePhysics() {
   mesh.quaternion.copy(body.quaternion);
 
   scene.children[4].children.forEach((child) => {
-    let body = bodies.find((obj) => {
-      return obj.uuid === child.uuid
-    })
-    // child.position.copy(body.body.position)
-    // child.quaternion.copy(body.body.quaternion)
+    if (child.type == 'Mesh') {
+      let body = bodies.find((obj) => {
+        return obj.uuid === child.uuid
+      })
+      child.position.copy(body.body.position)
+      child.quaternion.copy(body.body.quaternion)
+    }
   })
 
   // duckMesh.position.copy(duckBody.position);
