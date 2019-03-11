@@ -4,7 +4,6 @@ import * as THREE from 'three';
 import {add} from './wow.rs';
 import * as CANNON from 'cannon';
 import keyboardJS from 'keyboardjs';
-import './CannonDebugRenderer';
 import './GLTFLoader';
 import './OBJLoader';
 import './OrbitControls';
@@ -16,13 +15,13 @@ import './MTLLoader';
 import Stats from 'stats-js';
 import { threeToCannon } from './threetoCannon';
 import * as TWEEN from '@tweenjs/tween.js';
+import * as Ammo from 'ammo.js'
 
 let world, mass, body, shape, timeStep=1/60;
 let camera, scene, renderer;
 let geometry, material, mesh;
 let light;
 let controls;
-let cannonDebugRenderer;
 let stats;
 let ball;
 let bodies = [];
@@ -44,9 +43,9 @@ let tween;
     daeLoader.load(
     // resource URL
     // '/models/gltf/Duck/Duck.gltf',
-    // '/models/dae/level1.dae',
+    '/models/dae/level1.dae',
     // '/models/dae/temp.dae',
-    '/models/dae/lalala3(1).dae',
+    // '/models/dae/lalala3(1).dae',
     // '/models/fbx/level1.fbx',
     // called when the resource is loaded
     function ( obj ) {
@@ -209,9 +208,28 @@ function initThree() {
     // mesh.position.set(100, 100, 100)
 
     // light = new THREE.PointLight( 0xff0000, 0, 200 );
-    light = new THREE.AmbientLight( 0x404040 )
-    light.position.set( 0, 0, 0 );
-    scene.add( light );
+
+    var ambientLight = new THREE.AmbientLight(0x404040);
+    scene.add(ambientLight);
+
+    var light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(-7, 10, 15);
+    light.castShadow = true;
+    var d = 10;
+    light.shadow.camera.left = -d;
+    light.shadow.camera.right = d;
+    light.shadow.camera.top = d;
+    light.shadow.camera.bottom = -d;
+    light.shadow.camera.near = 2;
+    light.shadow.camera.far = 50;
+    light.shadow.mapSize.x = 1024;
+    light.shadow.mapSize.y = 1024;
+    light.shadow.bias = -0.01;
+    scene.add(light);
+
+    // light = new THREE.AmbientLight( 0x404040 )
+    // light.position.set( 0, 0, 0 );
+    // scene.add( light );
 
     document.body.innerHTML = '';
     document.body.appendChild( renderer.domElement );
@@ -293,14 +311,11 @@ function initCannon() {
   // var groundShape = threeToCannon(groundMesh);
   // groundBody.addShape(groundShape);
   // world.addBody(groundBody);
-
-  cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, world );
 }
 
 function animate() {
     requestAnimationFrame( animate );
     // stats.begin();
-    cannonDebugRenderer.update();
     renderer.render( scene, camera );
     updatePhysics();
     updateCamera();
