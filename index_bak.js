@@ -15,7 +15,6 @@ import './MTLLoader';
 import Stats from 'stats-js';
 import { threeToCannon } from './threetoCannon';
 import * as TWEEN from '@tweenjs/tween.js';
-import * as Ammo from 'ammo.js'
 
 let world, mass, body, shape, timeStep=1/60;
 let camera, scene, renderer;
