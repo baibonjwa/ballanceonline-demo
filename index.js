@@ -54,6 +54,7 @@ Ammo().then(function (Ammo) {
 
   var level1;
   var torus;
+  var ballBody;
 
   var daeLoader = new THREE.ColladaLoader();
   daeLoader.load(
@@ -94,21 +95,30 @@ Ammo().then(function (Ammo) {
     z: 0,
   }
 
-  // keyboardJS.bind(['d', 'right'], () => {
-  //   body.velocity.set(0, 0, 20);
-  // });
+  keyboardJS.bind(['d', 'right'], () => {
+    ballBody.setLinearVelocity(new Ammo.btVector3(0, 0, 10));
+    console.log(ball.position)
+  });
 
-  // keyboardJS.bind(['a', 'left'], () => {
-  //   body.velocity.set(0, 0, -20);
-  // });
+  keyboardJS.bind(['a', 'left'], () => {
+    ballBody.setLinearVelocity(new Ammo.btVector3(0, 0, -10));
+    console.log(ball.position)
+  });
 
-  // keyboardJS.bind(['w', 'up'], () => {
-  //   body.velocity.set(20, 0, 0);
-  // });
+  keyboardJS.bind(['w', 'up'], () => {
+    ballBody.setLinearVelocity(new Ammo.btVector3(10, 0, 0));
+    console.log(ball.position)
+  });
 
-  // keyboardJS.bind(['s', 'down'], () => {
-  //   body.velocity.set(-20, 0, 0);
-  // });
+  keyboardJS.bind(['s', 'down'], () => {
+    ballBody.setLinearVelocity(new Ammo.btVector3(-10, 0, 0));
+    console.log(ball.position)
+  });
+
+  keyboardJS.bind(['space'], () => {
+    ballBody.setLinearVelocity(new Ammo.btVector3(0, 20, 0));
+    console.log(ball.position)
+  });
 
   // keyboardJS.bind(['space'], () => {
   //   cameraRelativePosition = {
@@ -245,49 +255,20 @@ Ammo().then(function (Ammo) {
       ground.material.needsUpdate = true;
     });
 
-    // Wall
-    var brickMass = 0.5;
-    var brickLength = 1.2;
-    var brickDepth = 0.6;
-    var brickHeight = brickLength * 0.5;
-    var numBricksLength = 6;
-    var numBricksHeight = 8;
-    var z0 = -numBricksLength * brickLength * 0.5;
-    pos.set(0, brickHeight * 0.5, z0);
+    pos.set(-189.40704345703125, 10.1738862991333, 198.43898010253906);
     quat.set(0, 0, 0, 1);
-    for (var j = 0; j < numBricksHeight; j++) {
-
-      var oddRow = (j % 2) == 1;
-
-      pos.z = z0;
-
-      if (oddRow) {
-        pos.z -= 0.25 * brickLength;
-      }
-
-      var nRow = oddRow ? numBricksLength + 1 : numBricksLength;
-      for (var i = 0; i < nRow; i++) {
-
-        var brickLengthCurrent = brickLength;
-        var brickMassCurrent = brickMass;
-        if (oddRow && (i == 0 || i == nRow - 1)) {
-          brickLengthCurrent *= 0.5;
-          brickMassCurrent *= 0.5;
-        }
-
-        // var brick = createParalellepiped(brickDepth, brickHeight, brickLengthCurrent, brickMassCurrent, pos, quat, createMaterial());
-        // brick.castShadow = true;
-        // brick.receiveShadow = true;
-
-        if (oddRow && (i == 0 || i == nRow - 2)) {
-          pos.z += 0.75 * brickLength;
-        } else {
-          pos.z += brickLength;
-        }
-
-      }
-      pos.y += brickHeight;
-    }
+    ball = new THREE.Mesh(new THREE.SphereGeometry(2, 32, 32), new THREE.MeshPhongMaterial({
+      color: 0xFFFFFF,
+    }));
+    var ballShape = new Ammo.btSphereShape(2);
+    ballShape.setMargin(margin);
+    ballBody = createRigidBody(ball, ballShape, 3, pos, quat);
+    ball.castShadow = true;
+    ball.receiveShadow = true;
+    console.log(ballBody.getLinearVelocity());
+    console.log(ballBody);
+    ballBody.setLinearVelocity(new Ammo.btVector3(1, 1, 1));
+    ballBody.setDamping(0.5, 0.5);
 
     // The cloth
     // Cloth graphic object
@@ -392,8 +373,6 @@ Ammo().then(function (Ammo) {
     pos.set(0, 0, 0)
     quat.set(0, 0, 0, 1)
 
-    console.log('obj', obj)
-    console.log('g', obj.geometry);
     if (obj.type == 'Mesh') {
       var geometry = new THREE.Geometry().fromBufferGeometry(obj.geometry);
       var vertices = geometry.vertices;
@@ -499,8 +478,7 @@ Ammo().then(function (Ammo) {
       const localScale = new Ammo.btVector3(obj.scale.x, obj.scale.y, obj.scale.z);
       shape.setLocalScaling(localScale);
       shape.resources = [triangle_mesh];
-      createRigidBody(obj, shape, 0, pos, quat);
-
+      return createRigidBody(obj, shape, 0, pos, quat);
     }
   }
 
@@ -553,6 +531,7 @@ Ammo().then(function (Ammo) {
     }
 
     physicsWorld.addRigidBody(body);
+    return body;
   }
 
   function updatePhysics(deltaTime) {
@@ -628,6 +607,13 @@ Ammo().then(function (Ammo) {
     updatePhysics(deltaTime);
 
     controls.update(deltaTime);
+
+    camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
+    controls.target = new THREE.Vector3(
+      ball.position.x,
+      ball.position.y,
+      ball.position.z
+    )
 
     renderer.render(scene, camera);
 
