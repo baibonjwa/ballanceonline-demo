@@ -1,15 +1,22 @@
 import './main.scss'
 
 import * as THREE from 'three';
-import {add} from './wow.rs';
+import {
+  add
+} from './wow.rs';
 import * as CANNON from 'cannon';
 import keyboardJS from 'keyboardjs';
 import './OrbitControls';
 import './ColladaLoader';
 import './AmmoDebugDrawer';
 import Stats from 'stats-js';
-import { threeToCannon } from './threetoCannon';
+import {
+  threeToCannon
+} from './threetoCannon';
 import * as TWEEN from '@tweenjs/tween.js';
+import {
+  createCollisionShape
+} from './threetoAmmo';
 
 Ammo().then(function (Ammo) {
 
@@ -17,7 +24,7 @@ Ammo().then(function (Ammo) {
   let textureLoader;
   let clock = new THREE.Clock();
 
-  let world, mass, body, shape, timeStep=1/60;
+  let world, mass, body, shape, timeStep = 1 / 60;
   let camera, scene, renderer;
   let geometry, material, mesh;
   let light;
@@ -40,31 +47,35 @@ Ammo().then(function (Ammo) {
   var hinge;
   var cloth;
   var transformAux1 = new Ammo.btTransform();
+  var time = 0;
 
   var armMovement = 0;
   var debugDrawer;
 
-  var obj;
+  var level1;
   var torus;
 
   var daeLoader = new THREE.ColladaLoader();
-    daeLoader.load(
+  daeLoader.load(
     '/models/dae/level1.dae',
-    function ( obj ) {
+    // '/models/dae/torus.dae',
+    function (obj) {
       console.log(obj);
-      obj = obj;
-      torus = obj.scene.children[1]
+      level1 = obj.scene;
+      // torus = obj.scene.children[1]
+      torus = obj.scene.children[2]
       init();
-      scene.add( obj.scene );
+      animate();
+      // scene.add( obj.scene );
     },
     // called while loading is progressing
-    function ( xhr ) {
-      console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    function (xhr) {
+      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
     },
     // called when loading has errors
-    function ( error ) {
+    function (error) {
       console.log(error);
-      console.log( 'An error happened' );
+      console.log('An error happened');
     }
   );
 
@@ -74,7 +85,6 @@ Ammo().then(function (Ammo) {
     initPhysics();
     createObjects();
     initInput();
-    animate();
     initDebug();
   }
 
@@ -169,63 +179,7 @@ Ammo().then(function (Ammo) {
     stats.domElement.style.top = '0px';
     container.appendChild(stats.domElement);
 
-    //
-
     window.addEventListener('resize', onWindowResize, false);
-
-  }
-
-  function initThree() {
-
-      scene = new THREE.Scene();
-
-      camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
-
-      let cameraHelper = new THREE.CameraHelper(camera);
-      scene.add(cameraHelper);
-
-      var axesHelper = new THREE.AxesHelper( 100 );
-      scene.add( axesHelper );
-
-      geometry = new THREE.SphereGeometry( 3, 100, 100 );
-      material = new THREE.MeshNormalMaterial();
-
-      renderer = new THREE.WebGLRenderer( { antialias: false } );
-      renderer.setSize( window.innerWidth, window.innerHeight );
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-      controls = new THREE.OrbitControls( camera );
-      // controls.enableKeys = false;
-
-      mesh = new THREE.Mesh( geometry, material );
-      mesh.position.set(0, 0, 0);
-      scene.add( mesh );
-
-      var ambientLight = new THREE.AmbientLight(0x404040);
-      scene.add(ambientLight);
-
-      var light = new THREE.DirectionalLight(0xffffff, 1);
-      light.position.set(-7, 10, 15);
-      light.castShadow = true;
-      var d = 10;
-      light.shadow.camera.left = -d;
-      light.shadow.camera.right = d;
-      light.shadow.camera.top = d;
-      light.shadow.camera.bottom = -d;
-      light.shadow.camera.near = 2;
-      light.shadow.camera.far = 50;
-      light.shadow.mapSize.x = 1024;
-      light.shadow.mapSize.y = 1024;
-      light.shadow.bias = -0.01;
-      scene.add(light);
-
-      document.body.innerHTML = '';
-      document.body.appendChild( renderer.domElement );
-
-      stats = new Stats();
-      stats.showPanel(0);
-      document.body.appendChild( stats.dom );
   }
 
   function initInput() {
@@ -235,11 +189,13 @@ Ammo().then(function (Ammo) {
       switch (event.keyCode) {
         // Q
         case 81:
+          console.log('q')
           armMovement = 1;
           break;
 
           // A
         case 65:
+          console.log('a')
           armMovement = -1;
           break;
       }
@@ -364,93 +320,16 @@ Ammo().then(function (Ammo) {
       cloth.material.needsUpdate = true;
     });
 
+    // let level1Shape = createCollisionShape(level1, {});
+    // createRigidBody(level1, level1Shape, 0, pos, quat);
+    // console.log(level1Shape)
+    level1.children.forEach((obj) => {
+      // let shape = createCollisionShape(obj, {});
+      // createRigidBody(obj, shape, 0, pos, quat)
+      threeToAmmo(obj, shape)
+    })
 
-    pos.set(0, 3, 0)
-    quat.set(0, 0, 0, 1)
-    // var mTriMesh = new Ammo.btTriangleMeshShape();
-    var geometry = new THREE.Geometry().fromBufferGeometry( torus.geometry );
-    var vertices = geometry.vertices;
-    var triangles = [];
-    var face;
-    var _vec3_1 = new Ammo.btVector3(0, 0, 0);
-    var _vec3_2 = new Ammo.btVector3(0, 0, 0);
-    var _vec3_3 = new Ammo.btVector3(0, 0, 0);
-    var triangle_mesh = new Ammo.btTriangleMesh();
-    for ( let i = 0; i < geometry.faces.length; i++ ) {
-      face = geometry.faces[i];
-      if ( face instanceof THREE.Face3) {
-
-        triangles.push([
-          { x: vertices[face.a].x, y: vertices[face.a].y, z: vertices[face.a].z },
-          { x: vertices[face.b].x, y: vertices[face.b].y, z: vertices[face.b].z },
-          { x: vertices[face.c].x, y: vertices[face.c].y, z: vertices[face.c].z }
-        ]);
-
-      } else if ( face instanceof THREE.Face4 ) {
-
-        triangles.push([
-          { x: vertices[face.a].x, y: vertices[face.a].y, z: vertices[face.a].z },
-          { x: vertices[face.b].x, y: vertices[face.b].y, z: vertices[face.b].z },
-          { x: vertices[face.d].x, y: vertices[face.d].y, z: vertices[face.d].z }
-        ]);
-        triangles.push([
-          { x: vertices[face.b].x, y: vertices[face.b].y, z: vertices[face.b].z },
-          { x: vertices[face.c].x, y: vertices[face.c].y, z: vertices[face.c].z },
-          { x: vertices[face.d].x, y: vertices[face.d].y, z: vertices[face.d].z }
-        ]);
-
-      }
-    }
-
-    for ( let i = 0; i < triangles.length; i++ ) {
-      let triangle = triangles[i];
-
-      _vec3_1.setX(triangle[0].x );
-      _vec3_1.setY(triangle[0].y );
-      _vec3_1.setZ(triangle[0].z );
-
-      _vec3_2.setX(triangle[1].x );
-      _vec3_2.setY(triangle[1].y );
-      _vec3_2.setZ(triangle[1].z );
-
-      _vec3_3.setX(triangle[2].x );
-      _vec3_3.setY(triangle[2].y );
-      _vec3_3.setZ(triangle[2].z );
-
-      triangle_mesh.addTriangle(
-        _vec3_1,
-        _vec3_2,
-        _vec3_3,
-        true
-      );
-    }
-
-    // var shape = new Ammo.btBvhTriangleMeshShape(
-    var shape = new Ammo.btBvhTriangleMeshShape(
-      triangle_mesh,
-      true,
-      true,
-    );
-    console.log(triangle_mesh);
-    shape.setMargin(margin);
-    // todo: it's very bad to setLocalScaling on the shape after initializing, causing a needless BVH recalc --
-    // we should be using triMesh.setScaling prior to building the BVH
-    // torus.matrixWorld.decompose(pos, quat, scale);
-    // console.log(scale)
-    const localScale = new Ammo.btVector3(torus.scale.x, torus.scale.y, torus.scale.z);
-    shape.setLocalScaling(localScale);
-    // shape.resources = [triangle_mesh];
-    createRigidBody(torus, shape, 0, pos, quat);
-
-    console.log('triangle_mesh', triangle_mesh);
-    console.log('shape', shape);
-    console.log(torus);
-    // for (var i = 0; i < vx.length; i+=9){
-    //   tmpPos1.setValue( vx[i+0]*o.size[0], vx[i+1]*o.size[1], vx[i+2]*o.size[2] );
-    //   tmpPos2.setValue( vx[i+3]*o.size[0], vx[i+4]*o.size[1], vx[i+5]*o.size[2] );
-    //   tmpPos3.setValue( vx[i+6]*o.size[0], vx[i+7]*o.size[1], vx[i+8]*o.size[2] );
-    //   mTriMesh.addTriangle( tmpPos1, tmpPos2, tmpPos3, true );
-    // }
+    // threeToAmmo(torus);
 
     // Cloth physic object
     var softBodyHelpers = new Ammo.btSoftBodyHelpers();
@@ -506,6 +385,125 @@ Ammo().then(function (Ammo) {
 
   }
 
+  function threeToAmmo(obj) {
+    let pos = new THREE.Vector3();
+    let quat = new THREE.Quaternion();
+    let scale = new THREE.Vector3();
+    pos.set(0, 0, 0)
+    quat.set(0, 0, 0, 1)
+
+    console.log('obj', obj)
+    console.log('g', obj.geometry);
+    if (obj.type == 'Mesh') {
+      var geometry = new THREE.Geometry().fromBufferGeometry(obj.geometry);
+      var vertices = geometry.vertices;
+      var triangles = [];
+      var face;
+      var _vec3_1 = new Ammo.btVector3(0, 0, 0);
+      var _vec3_2 = new Ammo.btVector3(0, 0, 0);
+      var _vec3_3 = new Ammo.btVector3(0, 0, 0);
+      var triangle_mesh = new Ammo.btTriangleMesh();
+      for (let i = 0; i < geometry.faces.length; i++) {
+        face = geometry.faces[i];
+        if (face instanceof THREE.Face3) {
+
+          triangles.push([{
+              x: vertices[face.a].x,
+              y: vertices[face.a].y,
+              z: vertices[face.a].z
+            },
+            {
+              x: vertices[face.b].x,
+              y: vertices[face.b].y,
+              z: vertices[face.b].z
+            },
+            {
+              x: vertices[face.c].x,
+              y: vertices[face.c].y,
+              z: vertices[face.c].z
+            }
+          ]);
+
+        } else if (face instanceof THREE.Face4) {
+
+          triangles.push([{
+              x: vertices[face.a].x,
+              y: vertices[face.a].y,
+              z: vertices[face.a].z
+            },
+            {
+              x: vertices[face.b].x,
+              y: vertices[face.b].y,
+              z: vertices[face.b].z
+            },
+            {
+              x: vertices[face.d].x,
+              y: vertices[face.d].y,
+              z: vertices[face.d].z
+            }
+          ]);
+          triangles.push([{
+              x: vertices[face.b].x,
+              y: vertices[face.b].y,
+              z: vertices[face.b].z
+            },
+            {
+              x: vertices[face.c].x,
+              y: vertices[face.c].y,
+              z: vertices[face.c].z
+            },
+            {
+              x: vertices[face.d].x,
+              y: vertices[face.d].y,
+              z: vertices[face.d].z
+            }
+          ]);
+
+        }
+      }
+
+      for (let i = 0; i < triangles.length; i++) {
+        let triangle = triangles[i];
+
+        _vec3_1.setX(triangle[0].x);
+        _vec3_1.setY(triangle[0].y);
+        _vec3_1.setZ(triangle[0].z);
+
+        _vec3_2.setX(triangle[1].x);
+        _vec3_2.setY(triangle[1].y);
+        _vec3_2.setZ(triangle[1].z);
+
+        _vec3_3.setX(triangle[2].x);
+        _vec3_3.setY(triangle[2].y);
+        _vec3_3.setZ(triangle[2].z);
+
+        triangle_mesh.addTriangle(
+          _vec3_1,
+          _vec3_2,
+          _vec3_3,
+          true
+        );
+      }
+
+      // var shape = new Ammo.btBvhTriangleMeshShape(
+      var shape = new Ammo.btBvhTriangleMeshShape(
+        triangle_mesh,
+        true,
+        true,
+      );
+      shape.setMargin(margin);
+      // todo: it's very bad to setLocalScaling on the shape after initializing, causing a needless BVH recalc --
+      // we should be using triMesh.setScaling prior to building the BVH
+      // torus.matrixWorld.decompose(pos, quat, scale);
+      // console.log(scale)
+      const localScale = new Ammo.btVector3(obj.scale.x, obj.scale.y, obj.scale.z);
+      shape.setLocalScaling(localScale);
+      shape.resources = [triangle_mesh];
+      createRigidBody(obj, shape, 0, pos, quat);
+
+    }
+  }
+
   function createParalellepiped(sx, sy, sz, mass, pos, quat, material) {
 
     var threeObject = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
@@ -514,6 +512,16 @@ Ammo().then(function (Ammo) {
     createRigidBody(threeObject, shape, mass, pos, quat);
 
     return threeObject;
+  }
+
+  function createRandomColor() {
+    return Math.floor(Math.random() * (1 << 24));
+  }
+
+  function createMaterial() {
+    return new THREE.MeshPhongMaterial({
+      color: createRandomColor()
+    });
   }
 
   function createRigidBody(threeObject, physicsShape, mass, pos, quat) {
@@ -600,15 +608,35 @@ Ammo().then(function (Ammo) {
   }
 
   function animate() {
-      requestAnimationFrame( animate );
-      // stats.begin();
-      renderer.render( scene, camera );
-      updatePhysics();
-      updateCamera();
-      if (debugDrawer) debugDrawer.update();
-      // tween.update();
-      // stats.end();
+    requestAnimationFrame(animate);
+    render();
+    stats.update()
+
+    // stats.begin();
+    // renderer.render( scene, camera );
+    // updatePhysics();
+    // updateCamera();
+    // if (debugDrawer) debugDrawer.update();
+    // tween.update();
+    // stats.end();
   }
+
+  function render() {
+
+    var deltaTime = clock.getDelta();
+
+    updatePhysics(deltaTime);
+
+    controls.update(deltaTime);
+
+    renderer.render(scene, camera);
+
+    time += deltaTime;
+
+    if (debugDrawer) debugDrawer.update();
+
+  }
+
 
   function updateCamera() {
     controls.update();
@@ -620,11 +648,11 @@ Ammo().then(function (Ammo) {
     // )
   }
 
-  window.addEventListener( 'resize', onWindowResize, false );
+  window.addEventListener('resize', onWindowResize, false);
 
-  function onWindowResize(){
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize( window.innerWidth, window.innerHeight );
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
   }
 });
