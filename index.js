@@ -44,30 +44,23 @@ Ammo().then(function (Ammo) {
   var physicsWorld;
   var rigidBodies = [];
   var margin = 0.05;
-  var hinge;
-  var cloth;
   var transformAux1 = new Ammo.btTransform();
   var time = 0;
 
-  var armMovement = 0;
   var debugDrawer;
 
   var level1;
-  var torus;
   var ballBody;
+  let canMove;
 
   var daeLoader = new THREE.ColladaLoader();
   daeLoader.load(
     '/models/dae/level1.dae',
-    // '/models/dae/torus.dae',
     function (obj) {
       console.log(obj);
       level1 = obj.scene;
-      // torus = obj.scene.children[1]
-      torus = obj.scene.children[2]
       init();
       animate();
-      // scene.add( obj.scene );
     },
     // called while loading is progressing
     function (xhr) {
@@ -81,11 +74,9 @@ Ammo().then(function (Ammo) {
   );
 
   function init() {
-    // initThree();
     initGraphics();
     initPhysics();
     createObjects();
-    initInput();
     initDebug();
   }
 
@@ -95,23 +86,27 @@ Ammo().then(function (Ammo) {
     z: 0,
   }
 
-  keyboardJS.bind(['d', 'right'], () => {
-    ballBody.setLinearVelocity(new Ammo.btVector3(0, 0, 10));
+  keyboardJS.bind(['d', 'right'], (e) => {
+    let v = ballBody.getLinearVelocity()
+    ballBody.setLinearVelocity(new Ammo.btVector3(v.x(), v.y(), 10));
     console.log(ball.position)
   });
 
-  keyboardJS.bind(['a', 'left'], () => {
-    ballBody.setLinearVelocity(new Ammo.btVector3(0, 0, -10));
+  keyboardJS.bind(['a', 'left'], (e) => {
+    let v = ballBody.getLinearVelocity()
+    ballBody.setLinearVelocity(new Ammo.btVector3(v.x(), v.y(), -10));
     console.log(ball.position)
   });
 
-  keyboardJS.bind(['w', 'up'], () => {
-    ballBody.setLinearVelocity(new Ammo.btVector3(10, 0, 0));
+  keyboardJS.bind(['w', 'up'], (e) => {
+    let v = ballBody.getLinearVelocity()
+    ballBody.setLinearVelocity(new Ammo.btVector3(10, v.y(), v.z()));
     console.log(ball.position)
   });
 
-  keyboardJS.bind(['s', 'down'], () => {
-    ballBody.setLinearVelocity(new Ammo.btVector3(-10, 0, 0));
+  keyboardJS.bind(['s', 'down'], (e) => {
+    let v = ballBody.getLinearVelocity()
+    ballBody.setLinearVelocity(new Ammo.btVector3(-10, v.y(), v.z()));
     console.log(ball.position)
   });
 
@@ -192,34 +187,6 @@ Ammo().then(function (Ammo) {
     window.addEventListener('resize', onWindowResize, false);
   }
 
-  function initInput() {
-
-    window.addEventListener('keydown', function (event) {
-
-      switch (event.keyCode) {
-        // Q
-        case 81:
-          console.log('q')
-          armMovement = 1;
-          break;
-
-          // A
-        case 65:
-          console.log('a')
-          armMovement = -1;
-          break;
-      }
-
-    }, false);
-
-    window.addEventListener('keyup', function (event) {
-
-      armMovement = 0;
-
-    }, false);
-
-  }
-
   function initPhysics() {
 
     collisionConfiguration = new Ammo.btSoftBodyRigidBodyCollisionConfiguration();
@@ -239,22 +206,6 @@ Ammo().then(function (Ammo) {
     let quat = new THREE.Quaternion();
     let scale = new THREE.Vector3();
 
-    // Ground
-    pos.set(0, -0.5, 0);
-    quat.set(0, 0, 0, 1);
-    var ground = createParalellepiped(40, 1, 40, 0, pos, quat, new THREE.MeshPhongMaterial({
-      color: 0xFFFFFF
-    }));
-    ground.castShadow = true;
-    ground.receiveShadow = true;
-    textureLoader.load("../textures/grid.png", function (texture) {
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat.set(40, 40);
-      ground.material.map = texture;
-      ground.material.needsUpdate = true;
-    });
-
     pos.set(-189.40704345703125, 10.1738862991333, 198.43898010253906);
     quat.set(0, 0, 0, 1);
     ball = new THREE.Mesh(new THREE.SphereGeometry(2, 32, 32), new THREE.MeshPhongMaterial({
@@ -268,102 +219,11 @@ Ammo().then(function (Ammo) {
     console.log(ballBody.getLinearVelocity());
     console.log(ballBody);
     ballBody.setLinearVelocity(new Ammo.btVector3(1, 1, 1));
-    ballBody.setDamping(0.5, 0.5);
+    ballBody.setDamping(0.8, 0.8);
 
-    // The cloth
-    // Cloth graphic object
-    var clothWidth = 4;
-    var clothHeight = 3;
-    var clothNumSegmentsZ = clothWidth * 5;
-    var clothNumSegmentsY = clothHeight * 5;
-    var clothSegmentLengthZ = clothWidth / clothNumSegmentsZ;
-    var clothSegmentLengthY = clothHeight / clothNumSegmentsY;
-    var clothPos = new THREE.Vector3(-3, 3, 2);
-
-    //var clothGeometry = new THREE.BufferGeometry();
-    var clothGeometry = new THREE.PlaneBufferGeometry(clothWidth, clothHeight, clothNumSegmentsZ, clothNumSegmentsY);
-    clothGeometry.rotateY(Math.PI * 0.5)
-    clothGeometry.translate(clothPos.x, clothPos.y + clothHeight * 0.5, clothPos.z - clothWidth * 0.5)
-    //var clothMaterial = new THREE.MeshLambertMaterial( { color: 0x0030A0, side: THREE.DoubleSide } );
-    var clothMaterial = new THREE.MeshLambertMaterial({
-      color: 0xFFFFFF,
-      side: THREE.DoubleSide
-    });
-    cloth = new THREE.Mesh(clothGeometry, clothMaterial);
-    cloth.castShadow = true;
-    cloth.receiveShadow = true;
-    scene.add(cloth);
-    textureLoader.load("../textures/grid.png", function (texture) {
-      texture.wrapS = THREE.RepeatWrapping;
-      texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat.set(clothNumSegmentsZ, clothNumSegmentsY);
-      cloth.material.map = texture;
-      cloth.material.needsUpdate = true;
-    });
-
-    // let level1Shape = createCollisionShape(level1, {});
-    // createRigidBody(level1, level1Shape, 0, pos, quat);
-    // console.log(level1Shape)
     level1.children.forEach((obj) => {
-      // let shape = createCollisionShape(obj, {});
-      // createRigidBody(obj, shape, 0, pos, quat)
       threeToAmmo(obj, shape)
     })
-
-    // threeToAmmo(torus);
-
-    // Cloth physic object
-    var softBodyHelpers = new Ammo.btSoftBodyHelpers();
-    var clothCorner00 = new Ammo.btVector3(clothPos.x, clothPos.y + clothHeight, clothPos.z);
-    var clothCorner01 = new Ammo.btVector3(clothPos.x, clothPos.y + clothHeight, clothPos.z - clothWidth);
-    var clothCorner10 = new Ammo.btVector3(clothPos.x, clothPos.y, clothPos.z);
-    var clothCorner11 = new Ammo.btVector3(clothPos.x, clothPos.y, clothPos.z - clothWidth);
-    var clothSoftBody = softBodyHelpers.CreatePatch(physicsWorld.getWorldInfo(), clothCorner00, clothCorner01, clothCorner10, clothCorner11, clothNumSegmentsZ + 1, clothNumSegmentsY + 1, 0, true);
-    var sbConfig = clothSoftBody.get_m_cfg();
-    sbConfig.set_viterations(10);
-    sbConfig.set_piterations(10);
-
-    clothSoftBody.setTotalMass(0.9, false)
-    Ammo.castObject(clothSoftBody, Ammo.btCollisionObject).getCollisionShape().setMargin(margin * 3);
-    physicsWorld.addSoftBody(clothSoftBody, 1, -1);
-    cloth.userData.physicsBody = clothSoftBody;
-
-    // Disable deactivation
-    clothSoftBody.setActivationState(4);
-
-    // The base
-    var armMass = 2;
-    var armLength = 3 + clothWidth;
-    var pylonHeight = clothPos.y + clothHeight;
-    var baseMaterial = new THREE.MeshPhongMaterial({
-      color: 0x606060
-    });
-    pos.set(clothPos.x, 0.1, clothPos.z - armLength);
-    quat.set(0, 0, 0, 1);
-    var base = createParalellepiped(1, 0.2, 1, 0, pos, quat, baseMaterial);
-    base.castShadow = true;
-    base.receiveShadow = true;
-    pos.set(clothPos.x, 0.5 * pylonHeight, clothPos.z - armLength);
-    var pylon = createParalellepiped(0.4, pylonHeight, 0.4, 0, pos, quat, baseMaterial);
-    pylon.castShadow = true;
-    pylon.receiveShadow = true;
-    pos.set(clothPos.x, pylonHeight + 0.2, clothPos.z - 0.5 * armLength);
-    var arm = createParalellepiped(0.4, 0.4, armLength + 0.4, armMass, pos, quat, baseMaterial);
-    arm.castShadow = true;
-    arm.receiveShadow = true;
-
-    // Glue the cloth to the arm
-    var influence = 0.5;
-    clothSoftBody.appendAnchor(0, arm.userData.physicsBody, false, influence);
-    clothSoftBody.appendAnchor(clothNumSegmentsZ, arm.userData.physicsBody, false, influence);
-
-    // Hinge constraint to move the arm
-    var pivotA = new Ammo.btVector3(0, pylonHeight * 0.5, 0);
-    var pivotB = new Ammo.btVector3(0, -0.2, -armLength * 0.5);
-    var axis = new Ammo.btVector3(0, 1, 0);
-    hinge = new Ammo.btHingeConstraint(pylon.userData.physicsBody, arm.userData.physicsBody, pivotA, pivotB, axis, axis, true);
-    physicsWorld.addConstraint(hinge, true);
-
   }
 
   function threeToAmmo(obj) {
@@ -535,31 +395,8 @@ Ammo().then(function (Ammo) {
   }
 
   function updatePhysics(deltaTime) {
-
-    // Hinge control
-    hinge.enableAngularMotor(true, 0.8 * armMovement, 50);
-
     // Step world
     physicsWorld.stepSimulation(deltaTime, 10);
-
-    // Update cloth
-    var softBody = cloth.userData.physicsBody;
-    var clothPositions = cloth.geometry.attributes.position.array;
-    var numVerts = clothPositions.length / 3;
-    var nodes = softBody.get_m_nodes();
-    var indexFloat = 0;
-    for (var i = 0; i < numVerts; i++) {
-
-      var node = nodes.at(i);
-      var nodePos = node.get_m_x();
-      clothPositions[indexFloat++] = nodePos.x();
-      clothPositions[indexFloat++] = nodePos.y();
-      clothPositions[indexFloat++] = nodePos.z();
-
-    }
-    cloth.geometry.computeVertexNormals();
-    cloth.geometry.attributes.position.needsUpdate = true;
-    cloth.geometry.attributes.normal.needsUpdate = true;
 
     // Update rigid bodies
     for (var i = 0, il = rigidBodies.length; i < il; i++) {
@@ -580,24 +417,12 @@ Ammo().then(function (Ammo) {
   function initDebug() {
     debugDrawer = new THREE.AmmoDebugDrawer(scene, physicsWorld);
     debugDrawer.enable();
-    // setInterval(() => {
-    //   var mode = (debugDrawer.getDebugMode() + 1) % 3;
-    //   debugDrawer.setDebugMode(mode);
-    // }, 1000);
   }
 
   function animate() {
     requestAnimationFrame(animate);
     render();
     stats.update()
-
-    // stats.begin();
-    // renderer.render( scene, camera );
-    // updatePhysics();
-    // updateCamera();
-    // if (debugDrawer) debugDrawer.update();
-    // tween.update();
-    // stats.end();
   }
 
   function render() {
@@ -606,14 +431,7 @@ Ammo().then(function (Ammo) {
 
     updatePhysics(deltaTime);
 
-    controls.update(deltaTime);
-
-    camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
-    controls.target = new THREE.Vector3(
-      ball.position.x,
-      ball.position.y,
-      ball.position.z
-    )
+    updateCamera(deltaTime);
 
     renderer.render(scene, camera);
 
@@ -624,14 +442,15 @@ Ammo().then(function (Ammo) {
   }
 
 
-  function updateCamera() {
-    controls.update();
-    // camera.position.set(body.position.x + cameraRelativePosition.x, body.position.y + cameraRelativePosition.y, body.position.z)
-    // controls.target = new THREE.Vector3(
-    //   body.position.x,
-    //   body.position.y,
-    //   body.position.z
-    // )
+  function updateCamera(deltaTime) {
+    controls.update(deltaTime);
+
+    camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
+    controls.target = new THREE.Vector3(
+      ball.position.x,
+      ball.position.y,
+      ball.position.z
+    )
   }
 
   window.addEventListener('resize', onWindowResize, false);
