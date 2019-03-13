@@ -10,6 +10,7 @@ import './MTLLoader';
 import './AmmoDebugDrawer';
 import Stats from 'stats-js';
 import * as TWEEN from '@tweenjs/tween.js';
+import _ from 'lodash';
 
 Ammo().then(function (Ammo) {
 
@@ -45,39 +46,18 @@ Ammo().then(function (Ammo) {
   var level1;
   var ballBody;
 
-  var objLoader = new THREE.OBJLoader();
+  // var objLoader = new THREE.OBJLoader();
   // var fbxLoader = new THREE.FBXLoader();
-  // var daeLoader = new THREE.ColladaLoader();
-  var mtlLoader = new THREE.MTLLoader();
-  mtlLoader.setPath("/models/obj/level1/");
-  mtlLoader.load( 'level1.mtl', function( materials ) {
-    materials.preload();
-    objLoader.setPath("/models/obj/level1/");
-    objLoader.setMaterials( materials )
-    objLoader.load('level1.obj', function (obj) {
-      level1 = _.clone(obj);
-      console.log('level1', level1);
-      init();
-      animate();
-    },
-    // called while loading is progressing
-    function (xhr) {
-      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-    },
-    // called when loading has errors
-    function (error) {
-      console.log(error);
-      console.log('An error happened');
-    })
-  });
-
-  // fbxLoader.load(
-  //   // '/models/dae/level1.dae',
-  //   '/models/fbx/level1.fbx',
-  //   function (obj) {
-  //     // level1 = obj.scene;
-  //     level1 = obj;
-  //     console.log('obj', obj);
+  var daeLoader = new THREE.ColladaLoader();
+  // var mtlLoader = new THREE.MTLLoader();
+  // mtlLoader.setPath("/models/obj/level1/");
+  // mtlLoader.load( 'level1.mtl', function( materials ) {
+  //   materials.preload();
+  //   objLoader.setPath("/models/obj/level1/");
+  //   objLoader.setMaterials( materials )
+  //   objLoader.load('level1.obj', function (obj) {
+  //     level1 = obj
+  //     // level1 = _.cloneDeep(obj);
   //     console.log('level1', level1);
   //     init();
   //     animate();
@@ -90,8 +70,31 @@ Ammo().then(function (Ammo) {
   //   function (error) {
   //     console.log(error);
   //     console.log('An error happened');
-  //   }
-  // );
+  //   })
+  // });
+
+  daeLoader.load(
+  // fbxLoader.load(
+    '/models/dae/level1.dae',
+    // '/models/fbx/level1.fbx',
+    function (obj) {
+      level1 = obj.scene;
+      // level1 = obj;
+      console.log('obj', obj);
+      console.log('level1', level1);
+      init();
+      animate();
+    },
+    // called while loading is progressing
+    function (xhr) {
+      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+    },
+    // called when loading has errors
+    function (error) {
+      console.log(error);
+      console.log('An error happened');
+    }
+  );
 
   function init() {
     initGraphics();
@@ -106,27 +109,29 @@ Ammo().then(function (Ammo) {
     z: 0,
   }
 
+  const VELOCITY = 15;
+
   keyboardJS.bind(['d', 'right'], (e) => {
     let v = ballBody.getLinearVelocity()
-    ballBody.setLinearVelocity(new Ammo.btVector3(v.x(), v.y(), 10));
+    ballBody.setLinearVelocity(new Ammo.btVector3(v.x(), v.y(), VELOCITY));
     console.log(ball.position)
   });
 
   keyboardJS.bind(['a', 'left'], (e) => {
     let v = ballBody.getLinearVelocity()
-    ballBody.setLinearVelocity(new Ammo.btVector3(v.x(), v.y(), -10));
+    ballBody.setLinearVelocity(new Ammo.btVector3(v.x(), v.y(), -VELOCITY));
     console.log(ball.position)
   });
 
   keyboardJS.bind(['w', 'up'], (e) => {
     let v = ballBody.getLinearVelocity()
-    ballBody.setLinearVelocity(new Ammo.btVector3(10, v.y(), v.z()));
+    ballBody.setLinearVelocity(new Ammo.btVector3(VELOCITY, v.y(), v.z()));
     console.log(ball.position)
   });
 
   keyboardJS.bind(['s', 'down'], (e) => {
     let v = ballBody.getLinearVelocity()
-    ballBody.setLinearVelocity(new Ammo.btVector3(-10, v.y(), v.z()));
+    ballBody.setLinearVelocity(new Ammo.btVector3(-VELOCITY, v.y(), v.z()));
     console.log(ball.position)
   });
 
@@ -228,23 +233,22 @@ Ammo().then(function (Ammo) {
 
     pos.set(54.134429931640625, 16.012664794921875, 153.05307006835938);
     quat.set(0, 0, 0, 1);
-    ball = new THREE.Mesh(new THREE.SphereGeometry(2, 32, 32), new THREE.MeshPhongMaterial({
+    ball = new THREE.Mesh(new THREE.SphereGeometry(2, 16, 16), new THREE.MeshPhongMaterial({
       color: 0xFFFFFF,
     }));
     var ballShape = new Ammo.btSphereShape(2);
     ballShape.setMargin(margin);
-    ballBody = createRigidBody(ball, ballShape, 3, pos, quat);
+    ballBody = createRigidBody(ball, ballShape, 1, pos, quat);
     ball.castShadow = true;
     ball.receiveShadow = true;
     ballBody.setLinearVelocity(new Ammo.btVector3(1, 1, 1));
-    ballBody.setDamping(0.5, 0.5);
-
+    ballBody.setDamping(0.8, 0);
 
     let collisionList = [
       // 'objA01_Floor_01',
-      'objSkyLayer',
-      'objQuader01',
-      'objQuader02',
+      // 'objSkyLayer',
+      // 'objQuader01',
+      // 'objQuader02',
       // 'objQuader03',
       // 'objQuader04',
       // 'objA01_Floor_01_02',
@@ -257,21 +261,31 @@ Ammo().then(function (Ammo) {
       // 'objA01_Floor_Columns_Top',
     ]
 
+
     level1.children.forEach((obj, index) => {
-      if (collisionList.includes(obj.name)) {
+      setTimeout(() => {
         threeToAmmo(obj, shape)
-      }
-      console.log(index)
-      console.log(obj);
-      console.log(obj.name)
-      if (staticList.includes(obj.name)) {
-        console.log('static', obj.name)
-        pos.set(0, 0, 0)
-        quat.set(0, 0, 0, 1);
-        obj.position.copy(pos);
-        obj.quaternion.copy(quat)
-        scene.add(obj);
-      }
+      }, 0)
+      // console.log('static', obj.name)
+      // pos.set(0, 0, 0)
+      // quat.set(0, 0, 0, 1);
+      // obj.position.copy(pos);
+      // obj.quaternion.copy(quat)
+      // console.log(scene);
+      // setTimeout(() => {
+      //   scene.add(obj);
+      // }, 0)
+      // if (collisionList.includes(obj.name)) {
+      //   threeToAmmo(obj, shape)
+      // }
+      // if (staticList.includes(obj.name)) {
+      //   console.log('static', obj.name)
+      //   pos.set(0, 0, 0)
+      //   quat.set(0, 0, 0, 1);
+      //   obj.position.copy(pos);
+      //   obj.quaternion.copy(quat)
+      //   scene.add(obj);
+      // }
     })
   }
 
@@ -465,7 +479,7 @@ Ammo().then(function (Ammo) {
 
   function initDebug() {
     debugDrawer = new THREE.AmmoDebugDrawer(scene, physicsWorld);
-    debugDrawer.enable();
+    // debugDrawer.enable();
   }
 
   function animate() {
@@ -494,12 +508,12 @@ Ammo().then(function (Ammo) {
   function updateCamera(deltaTime) {
     controls.update(deltaTime);
 
-    // camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
-    // controls.target = new THREE.Vector3(
-    //   ball.position.x,
-    //   ball.position.y,
-    //   ball.position.z
-    // )
+    camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
+    controls.target = new THREE.Vector3(
+      ball.position.x,
+      ball.position.y,
+      ball.position.z
+    )
   }
 
   window.addEventListener('resize', onWindowResize, false);
