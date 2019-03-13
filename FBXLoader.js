@@ -18,7 +18,7 @@
  *		https://code.blender.org/2013/08/fbx-binary-file-format-specification/
  */
 import * as THREE from 'three';
-const Zlib = require("./inflate.min.js").Zlib;
+const Zlib = require("./inflate.js").Zlib;
 window.Zlib = Zlib;
 
 THREE.FBXLoader = ( function () {
