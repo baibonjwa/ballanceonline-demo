@@ -237,6 +237,7 @@ Ammo().then(function (Ammo) {
     }));
     var ballShape = new Ammo.btSphereShape(2);
     ballShape.setMargin(margin);
+    // ballBody = createRigidBody(ball, ballShape, 1, pos, quat);
     ballBody = createRigidBody(ball, ballShape, 1, pos, quat);
     ball.castShadow = true;
     ball.receiveShadow = true;
@@ -274,23 +275,28 @@ Ammo().then(function (Ammo) {
       setTimeout(() => {
         if (boxList.includes(obj.name)) {
 
-          // let pos = new THREE.Vector3();
-          // let quat = new THREE.Quaternion();
-          // const v = new THREE.Vector3();
+          let pos = new THREE.Vector3();
+          let quat = new THREE.Quaternion();
+          const v = new THREE.Vector3();
 
-          // obj.geometry.computeBoundingBox();
-          // let bBox = obj.geometry.boundingBox.clone();
+          obj.geometry.computeBoundingBox();
+          let bBox = obj.geometry.boundingBox.clone();
 
-          // const btHalfExtents = new Ammo.btVector3(bBox.size().x / 2, bBox.size().y / 2, bBox.size().z / 2);
-          // const collisionShape = new Ammo.btBoxShape(btHalfExtents);
+          const btHalfExtents = new Ammo.btVector3(bBox.size().x / 2, bBox.size().y / 2, bBox.size().z / 2);
+          const collisionShape = new Ammo.btBoxShape(btHalfExtents);
 
-          // pos.set(bBox.center().x, bBox.center().y, bBox.center().z);
-          // quat.set(0, 0, 0, 1);
-          // createRigidBody(obj, collisionShape, 1, pos, quat);
+          const offset = bBox.center();
+
+          obj.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(
+            -offset.x, -offset.y, -offset.z));
+
+          pos.set(offset.x, offset.y, offset.z);
+          quat.set(0, 0, 0, 1);
+          createRigidBody(obj, collisionShape, 1, pos, quat);
 
           // console.log(obj);
-          // threeToAmmo(obj, 0)
-          threeToAmmo(obj)
+          // threeToAmmo(obj, 10)
+          // threeToAmmo(obj)
 
         } else {
           threeToAmmo(obj)
@@ -323,8 +329,25 @@ Ammo().then(function (Ammo) {
     let pos = new THREE.Vector3();
     let quat = new THREE.Quaternion();
     let scale = new THREE.Vector3();
-    pos.set(0, 0, 0)
-    quat.set(0, 0, 0, 1)
+
+    if (mass > 0) {
+      // debugger;
+      // let geom = threeObject.geometry;
+      // threeObject.centroid = new THREE.Vector3();
+      // for (var i = 0, l = geom.vertices.length; i < l; i++) {
+      //     threeObject.centroid.add(geom.vertices[i].clone());
+      // }
+      // threeObject.centroid.divideScalar(geom.vertices.length);
+      // var offset = threeObject.centroid.clone();
+      // objMesh.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(-offset.x, -offset.y, -offset.z));
+      // objMesh.position.copy(objMesh.centroid);
+
+      obj.geometry.computeBoundingBox();
+      let offset = obj.geometry.boundingBox.center();
+      obj.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(
+        -offset.x, -offset.y, -offset.z));
+      pos.set(offset.x, offset.y, offset.z);
+    }
 
     if (obj.type == 'Mesh') {
       var geometry = new THREE.Geometry().fromBufferGeometry(obj.geometry);
@@ -462,6 +485,7 @@ Ammo().then(function (Ammo) {
 
     var transform = new Ammo.btTransform();
     transform.setIdentity();
+    // transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
     transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
     transform.setRotation(new Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
     var motionState = new Ammo.btDefaultMotionState(transform);
@@ -500,6 +524,9 @@ Ammo().then(function (Ammo) {
         ms.getWorldTransform(transformAux1);
         var p = transformAux1.getOrigin();
         var q = transformAux1.getRotation();
+        if (objThree.name === 'objP_Box_01') {
+          console.log(p.x(), p.y(), p.z())
+        }
         objThree.position.set(p.x(), p.y(), p.z());
         objThree.quaternion.set(q.x(), q.y(), q.z(), q.w());
       }
@@ -508,7 +535,7 @@ Ammo().then(function (Ammo) {
 
   function initDebug() {
     debugDrawer = new THREE.AmmoDebugDrawer(scene, physicsWorld);
-    // debugDrawer.enable();
+    debugDrawer.enable();
   }
 
   function animate() {
@@ -537,12 +564,12 @@ Ammo().then(function (Ammo) {
   function updateCamera(deltaTime) {
     controls.update(deltaTime);
 
-    camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
-    controls.target = new THREE.Vector3(
-      ball.position.x,
-      ball.position.y,
-      ball.position.z
-    )
+    // camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
+    // controls.target = new THREE.Vector3(
+    //   ball.position.x,
+    //   ball.position.y,
+    //   ball.position.z
+    // )
   }
 
   window.addEventListener('resize', onWindowResize, false);
