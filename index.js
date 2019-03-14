@@ -523,7 +523,7 @@ Ammo().then(function (Ammo) {
 
   function initDebug() {
     debugDrawer = new THREE.AmmoDebugDrawer(scene, physicsWorld);
-    debugDrawer.enable();
+    // debugDrawer.enable();
   }
 
   function animate() {
@@ -552,12 +552,12 @@ Ammo().then(function (Ammo) {
   function updateCamera(deltaTime) {
     controls.update(deltaTime);
 
-    // camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
-    // controls.target = new THREE.Vector3(
-    //   ball.position.x,
-    //   ball.position.y,
-    //   ball.position.z
-    // )
+    camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
+    controls.target = new THREE.Vector3(
+      ball.position.x,
+      ball.position.y,
+      ball.position.z
+    )
   }
 
   window.addEventListener('resize', onWindowResize, false);
