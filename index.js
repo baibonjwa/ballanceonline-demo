@@ -331,17 +331,6 @@ Ammo().then(function (Ammo) {
     let scale = new THREE.Vector3();
 
     if (mass > 0) {
-      // debugger;
-      // let geom = threeObject.geometry;
-      // threeObject.centroid = new THREE.Vector3();
-      // for (var i = 0, l = geom.vertices.length; i < l; i++) {
-      //     threeObject.centroid.add(geom.vertices[i].clone());
-      // }
-      // threeObject.centroid.divideScalar(geom.vertices.length);
-      // var offset = threeObject.centroid.clone();
-      // objMesh.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(-offset.x, -offset.y, -offset.z));
-      // objMesh.position.copy(objMesh.centroid);
-
       obj.geometry.computeBoundingBox();
       let offset = obj.geometry.boundingBox.center();
       obj.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(
@@ -485,7 +474,6 @@ Ammo().then(function (Ammo) {
 
     var transform = new Ammo.btTransform();
     transform.setIdentity();
-    // transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
     transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
     transform.setRotation(new Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
     var motionState = new Ammo.btDefaultMotionState(transform);
