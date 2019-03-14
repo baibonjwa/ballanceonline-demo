@@ -46,18 +46,40 @@ Ammo().then(function (Ammo) {
   var level1;
   var ballBody;
 
-  // var objLoader = new THREE.OBJLoader();
+  var objLoader = new THREE.OBJLoader();
   // var fbxLoader = new THREE.FBXLoader();
-  var daeLoader = new THREE.ColladaLoader();
-  // var mtlLoader = new THREE.MTLLoader();
-  // mtlLoader.setPath("/models/obj/level1/");
-  // mtlLoader.load( 'level1.mtl', function( materials ) {
-  //   materials.preload();
-  //   objLoader.setPath("/models/obj/level1/");
-  //   objLoader.setMaterials( materials )
-  //   objLoader.load('level1.obj', function (obj) {
-  //     level1 = obj
-  //     // level1 = _.cloneDeep(obj);
+  // var daeLoader = new THREE.ColladaLoader();
+  var mtlLoader = new THREE.MTLLoader();
+  mtlLoader.setPath("/models/obj/level1/");
+  mtlLoader.load( 'level1(1).mtl', function( materials ) {
+    materials.preload();
+    objLoader.setPath("/models/obj/level1/");
+    objLoader.setMaterials( materials )
+    objLoader.load('level1(1).obj', function (obj) {
+      level1 = obj
+      init();
+      animate();
+    },
+    // called while loading is progressing
+    function (xhr) {
+      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+    },
+    // called when loading has errors
+    function (error) {
+      console.log(error);
+      console.log('An error happened');
+    })
+  });
+
+  // daeLoader.load(
+  // // fbxLoader.load(
+  //   // '/models/dae/level1.dae',
+  //   '/models/dae/level1(1).dae',
+  //   // '/models/fbx/level1.fbx',
+  //   function (obj) {
+  //     level1 = obj.scene;
+  //     // level1 = obj;
+  //     console.log('obj', obj);
   //     console.log('level1', level1);
   //     init();
   //     animate();
@@ -70,31 +92,8 @@ Ammo().then(function (Ammo) {
   //   function (error) {
   //     console.log(error);
   //     console.log('An error happened');
-  //   })
-  // });
-
-  daeLoader.load(
-  // fbxLoader.load(
-    '/models/dae/level1.dae',
-    // '/models/fbx/level1.fbx',
-    function (obj) {
-      level1 = obj.scene;
-      // level1 = obj;
-      console.log('obj', obj);
-      console.log('level1', level1);
-      init();
-      animate();
-    },
-    // called while loading is progressing
-    function (xhr) {
-      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-    },
-    // called when loading has errors
-    function (error) {
-      console.log(error);
-      console.log('An error happened');
-    }
-  );
+  //   }
+  // );
 
   function init() {
     initGraphics();
@@ -261,10 +260,41 @@ Ammo().then(function (Ammo) {
       // 'objA01_Floor_Columns_Top',
     ]
 
+    let boxList = [
+      'objP_Box_01',
+      'objP_Box_02',
+      'objP_Box_03',
+      'objP_Box_04',
+      'objP_Box_05',
+      'objP_Box_06',
+    ]
+
 
     level1.children.forEach((obj, index) => {
       setTimeout(() => {
-        threeToAmmo(obj, shape)
+        if (boxList.includes(obj.name)) {
+
+          // let pos = new THREE.Vector3();
+          // let quat = new THREE.Quaternion();
+          // const v = new THREE.Vector3();
+
+          // obj.geometry.computeBoundingBox();
+          // let bBox = obj.geometry.boundingBox.clone();
+
+          // const btHalfExtents = new Ammo.btVector3(bBox.size().x / 2, bBox.size().y / 2, bBox.size().z / 2);
+          // const collisionShape = new Ammo.btBoxShape(btHalfExtents);
+
+          // pos.set(bBox.center().x, bBox.center().y, bBox.center().z);
+          // quat.set(0, 0, 0, 1);
+          // createRigidBody(obj, collisionShape, 1, pos, quat);
+
+          // console.log(obj);
+          // threeToAmmo(obj, 0)
+          threeToAmmo(obj)
+
+        } else {
+          threeToAmmo(obj)
+        }
       }, 0)
       // console.log('static', obj.name)
       // pos.set(0, 0, 0)
@@ -289,7 +319,7 @@ Ammo().then(function (Ammo) {
     })
   }
 
-  function threeToAmmo(obj) {
+  function threeToAmmo(obj, mass = 0) {
     let pos = new THREE.Vector3();
     let quat = new THREE.Quaternion();
     let scale = new THREE.Vector3();
@@ -401,7 +431,7 @@ Ammo().then(function (Ammo) {
       const localScale = new Ammo.btVector3(obj.scale.x, obj.scale.y, obj.scale.z);
       shape.setLocalScaling(localScale);
       shape.resources = [triangle_mesh];
-      return createRigidBody(obj, shape, 0, pos, quat);
+      return createRigidBody(obj, shape, mass, pos, quat);
     }
   }
 
@@ -467,7 +497,6 @@ Ammo().then(function (Ammo) {
       var objPhys = objThree.userData.physicsBody;
       var ms = objPhys.getMotionState();
       if (ms) {
-
         ms.getWorldTransform(transformAux1);
         var p = transformAux1.getOrigin();
         var q = transformAux1.getRotation();
