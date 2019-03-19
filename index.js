@@ -29,7 +29,8 @@ Ammo().then(function (Ammo) {
   let tween;
 
   // Physics variables
-  var gravityConstant = -9.8;
+  // var gravityConstant = -9.8;
+  var gravityConstant = -50;
   var collisionConfiguration;
   var dispatcher;
   var broadphase;
@@ -51,11 +52,11 @@ Ammo().then(function (Ammo) {
   // var daeLoader = new THREE.ColladaLoader();
   var mtlLoader = new THREE.MTLLoader();
   mtlLoader.setPath("/models/obj/level1/");
-  mtlLoader.load( 'level1(1).mtl', function( materials ) {
+  mtlLoader.load( 'level1-3.mtl', function( materials ) {
     materials.preload();
     objLoader.setPath("/models/obj/level1/");
     objLoader.setMaterials( materials )
-    objLoader.load('level1(1).obj', function (obj) {
+    objLoader.load('level1-3.obj', function (obj) {
       level1 = obj
       init();
       animate();
@@ -104,11 +105,11 @@ Ammo().then(function (Ammo) {
 
   let cameraRelativePosition = {
     x: -20,
-    y: 40,
+    y: 30,
     z: 0,
   }
 
-  const VELOCITY = 15;
+  const VELOCITY = 20;
 
   keyboardJS.bind(['d', 'right'], (e) => {
     let v = ballBody.getLinearVelocity()
@@ -139,7 +140,7 @@ Ammo().then(function (Ammo) {
     console.log(ball.position)
   });
 
-  // keyboardJS.bind(['space'], () => {
+  // keyboardJS.bind(['shift+up'], () => {
   //   cameraRelativePosition = {
   //     x: -0.1,
   //     y: 60,
@@ -152,6 +153,11 @@ Ammo().then(function (Ammo) {
   //     z: 0,
   //   }
   // });
+
+  keyboardJS.bind(['shift+up'], () => {
+    camera.rotation.y = 90 * Math.PI / 180
+  }, () => {
+  });
 
 
   function initGraphics() {
@@ -224,42 +230,52 @@ Ammo().then(function (Ammo) {
 
   }
 
+  function createBall() {
+    var loader = new THREE.TextureLoader();
+    loader.load( './models/obj/level1/Textures/Ball_Wood.bmp', function ( texture ) {
+      let pos = new THREE.Vector3();
+      let quat = new THREE.Quaternion();
+
+      pos.set(54.134429931640625, 16.012664794921875, 153.05307006835938);
+      quat.set(0, 0, 0, 1);
+      const BALL_SIZE = 2
+      // textrue.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      // texture.repeat.set( 125, 125 );
+      ball = new THREE.Mesh(new THREE.SphereGeometry(BALL_SIZE, 12, 12), new THREE.MeshBasicMaterial({
+        map: texture,
+        overdraw: 1,
+      }));
+      var ballShape = new Ammo.btSphereShape(BALL_SIZE);
+      ballShape.setMargin(margin);
+      // ballBody = createRigidBody(ball, ballShape, 1, pos, quat);
+      ballBody = createRigidBody(ball, ballShape, 1, pos, quat);
+      ball.castShadow = true;
+      ball.receiveShadow = true;
+      // ball.userData.physicsBody.setFriction(0.);
+      ballBody.setLinearVelocity(new Ammo.btVector3(1, 1, 1));
+      ballBody.setDamping(0.7, 0);
+      ballBody.setFriction(0.4);
+      ballBody.setRollingFriction(0.4);
+    });
+  }
+
   function createObjects() {
-
-    let pos = new THREE.Vector3();
-    let quat = new THREE.Quaternion();
-    let scale = new THREE.Vector3();
-
-    pos.set(54.134429931640625, 16.012664794921875, 153.05307006835938);
-    quat.set(0, 0, 0, 1);
-    ball = new THREE.Mesh(new THREE.SphereGeometry(2, 16, 16), new THREE.MeshPhongMaterial({
-      color: 0xFFFFFF,
-    }));
-    var ballShape = new Ammo.btSphereShape(2);
-    ballShape.setMargin(margin);
-    // ballBody = createRigidBody(ball, ballShape, 1, pos, quat);
-    ballBody = createRigidBody(ball, ballShape, 1, pos, quat);
-    ball.castShadow = true;
-    ball.receiveShadow = true;
-    ballBody.setLinearVelocity(new Ammo.btVector3(1, 1, 1));
-    ballBody.setDamping(0.8, 0);
-
-    let collisionList = [
-      // 'objA01_Floor_01',
-      // 'objSkyLayer',
-      // 'objQuader01',
-      // 'objQuader02',
-      // 'objQuader03',
-      // 'objQuader04',
-      // 'objA01_Floor_01_02',
-      // 'objA01_Tower',
-      // 'objA01_Floor_Columns_Top',
+    let hiddenList = [
+      'objQuader01',
+      'objQuader02',
+      'objQuader03',
+      'objQuader04',
     ]
 
-    let staticList = [
-      // 'objA01_Tower',
-      // 'objA01_Floor_Columns_Top',
+    let extraLifeList = [
+      'objP_Extra_Life_01',
+      'objP_Extra_Life_02',
+      'objP_Extra_Life_03',
+      'objP_Extra_Life_04',
     ]
+
+    let woodBallList = [];
+    let paperBallList = [];
 
     let boxList = [
       'objP_Box_01',
@@ -270,58 +286,38 @@ Ammo().then(function (Ammo) {
       'objP_Box_06',
     ]
 
-
+    createBall();
     level1.children.forEach((obj, index) => {
-      setTimeout(() => {
-        if (boxList.includes(obj.name)) {
+      if (!hiddenList.includes(obj.name)) {
+        setTimeout(() => {
+          if (extraLifeList.includes(obj.name)) {
+            return;
+          }
+          if (boxList.includes(obj.name)) {
 
-          let pos = new THREE.Vector3();
-          let quat = new THREE.Quaternion();
-          const v = new THREE.Vector3();
+            let pos = new THREE.Vector3();
+            let quat = new THREE.Quaternion();
+            const v = new THREE.Vector3();
 
-          obj.geometry.computeBoundingBox();
-          let bBox = obj.geometry.boundingBox.clone();
+            obj.geometry.computeBoundingBox();
+            let bBox = obj.geometry.boundingBox.clone();
 
-          const btHalfExtents = new Ammo.btVector3(bBox.size().x / 2, bBox.size().y / 2, bBox.size().z / 2);
-          const collisionShape = new Ammo.btBoxShape(btHalfExtents);
+            const btHalfExtents = new Ammo.btVector3(bBox.size().x / 2, bBox.size().y / 2, bBox.size().z / 2);
+            const collisionShape = new Ammo.btBoxShape(btHalfExtents);
 
-          const offset = bBox.center();
+            const offset = bBox.center();
 
-          obj.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(
-            -offset.x, -offset.y, -offset.z));
+            obj.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(
+              -offset.x, -offset.y, -offset.z));
 
-          pos.set(offset.x, offset.y, offset.z);
-          quat.set(0, 0, 0, 1);
-          createRigidBody(obj, collisionShape, 1, pos, quat);
-
-          // console.log(obj);
-          // threeToAmmo(obj, 10)
-          // threeToAmmo(obj)
-
-        } else {
-          threeToAmmo(obj)
-        }
-      }, 0)
-      // console.log('static', obj.name)
-      // pos.set(0, 0, 0)
-      // quat.set(0, 0, 0, 1);
-      // obj.position.copy(pos);
-      // obj.quaternion.copy(quat)
-      // console.log(scene);
-      // setTimeout(() => {
-      //   scene.add(obj);
-      // }, 0)
-      // if (collisionList.includes(obj.name)) {
-      //   threeToAmmo(obj, shape)
-      // }
-      // if (staticList.includes(obj.name)) {
-      //   console.log('static', obj.name)
-      //   pos.set(0, 0, 0)
-      //   quat.set(0, 0, 0, 1);
-      //   obj.position.copy(pos);
-      //   obj.quaternion.copy(quat)
-      //   scene.add(obj);
-      // }
+            pos.set(offset.x, offset.y, offset.z);
+            quat.set(0, 0, 0, 1);
+            createRigidBody(obj, collisionShape, 5, pos, quat);
+          } else {
+            threeToAmmo(obj)
+          }
+        }, 0)
+      }
     })
   }
 
@@ -485,6 +481,8 @@ Ammo().then(function (Ammo) {
     var body = new Ammo.btRigidBody(rbInfo);
 
     threeObject.userData.physicsBody = body;
+    body.setFriction(0.4);
+    body.setRollingFriction(0.4);
 
     scene.add(threeObject);
 
@@ -552,12 +550,14 @@ Ammo().then(function (Ammo) {
   function updateCamera(deltaTime) {
     controls.update(deltaTime);
 
-    camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
-    controls.target = new THREE.Vector3(
-      ball.position.x,
-      ball.position.y,
-      ball.position.z
-    )
+    if (ball) {
+      camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
+      controls.target = new THREE.Vector3(
+        ball.position.x,
+        ball.position.y,
+        ball.position.z
+      )
+    }
   }
 
   window.addEventListener('resize', onWindowResize, false);
