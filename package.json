@@ -18,6 +18,7 @@
     "start": "node start.js"
   },
   "devDependencies": {
+    "cssnano": "^4.1.10",
     "parcel-plugin-static-files-copy": "^2.0.0"
   },
   "staticFiles": {
