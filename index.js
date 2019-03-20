@@ -2,15 +2,28 @@ import './main.scss'
 
 import * as THREE from 'three';
 import keyboardJS from 'keyboardjs';
-import './OrbitControls';
-import './ColladaLoader';
-import './FBXLoader';
-import './OBJLoader';
-import './MTLLoader';
-import './AmmoDebugDrawer';
+import './lib/OrbitControls';
+import './lib/ColladaLoader';
+import './lib/FBXLoader';
+import './lib/OBJLoader';
+import './lib/MTLLoader';
+import './lib/AmmoDebugDrawer';
 import Stats from 'stats-js';
 import * as TWEEN from '@tweenjs/tween.js';
 import _ from 'lodash';
+import {
+  BOX_LIST,
+  BALL_PAPER_LIST,
+  BALL_STONE_LIST,
+  BALL_WOOD_LIST,
+  EXTRA_LIFE_LIST,
+  HIDDEN_LIST,
+  EXTRA_POINT_LIST,
+  TRAFO_STONE_LIST,
+  TRAFO_WOOD_LIST,
+  TRAFO_PAPER_LIST,
+  RESET_POINT_LIST,
+} from './levels/level1';
 
 Ammo().then(function (Ammo) {
 
@@ -48,8 +61,6 @@ Ammo().then(function (Ammo) {
   var ballBody;
 
   var objLoader = new THREE.OBJLoader();
-  // var fbxLoader = new THREE.FBXLoader();
-  // var daeLoader = new THREE.ColladaLoader();
   var mtlLoader = new THREE.MTLLoader();
   mtlLoader.setPath("/models/obj/level1/");
   mtlLoader.load( 'level1-3.mtl', function( materials ) {
@@ -72,30 +83,6 @@ Ammo().then(function (Ammo) {
     })
   });
 
-  // daeLoader.load(
-  // // fbxLoader.load(
-  //   // '/models/dae/level1.dae',
-  //   '/models/dae/level1(1).dae',
-  //   // '/models/fbx/level1.fbx',
-  //   function (obj) {
-  //     level1 = obj.scene;
-  //     // level1 = obj;
-  //     console.log('obj', obj);
-  //     console.log('level1', level1);
-  //     init();
-  //     animate();
-  //   },
-  //   // called while loading is progressing
-  //   function (xhr) {
-  //     console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-  //   },
-  //   // called when loading has errors
-  //   function (error) {
-  //     console.log(error);
-  //     console.log('An error happened');
-  //   }
-  // );
-
   function init() {
     initGraphics();
     initPhysics();
@@ -114,25 +101,22 @@ Ammo().then(function (Ammo) {
   keyboardJS.bind(['d', 'right'], (e) => {
     let v = ballBody.getLinearVelocity()
     ballBody.setLinearVelocity(new Ammo.btVector3(v.x(), v.y(), VELOCITY));
-    console.log(ball.position)
+    // console.log(ball.position)
   });
 
   keyboardJS.bind(['a', 'left'], (e) => {
     let v = ballBody.getLinearVelocity()
     ballBody.setLinearVelocity(new Ammo.btVector3(v.x(), v.y(), -VELOCITY));
-    console.log(ball.position)
   });
 
   keyboardJS.bind(['w', 'up'], (e) => {
     let v = ballBody.getLinearVelocity()
     ballBody.setLinearVelocity(new Ammo.btVector3(VELOCITY, v.y(), v.z()));
-    console.log(ball.position)
   });
 
   keyboardJS.bind(['s', 'down'], (e) => {
     let v = ballBody.getLinearVelocity()
     ballBody.setLinearVelocity(new Ammo.btVector3(-VELOCITY, v.y(), v.z()));
-    console.log(ball.position)
   });
 
   keyboardJS.bind(['space'], () => {
@@ -260,40 +244,20 @@ Ammo().then(function (Ammo) {
   }
 
   function createObjects() {
-    let hiddenList = [
-      'objQuader01',
-      'objQuader02',
-      'objQuader03',
-      'objQuader04',
-    ]
-
-    let extraLifeList = [
-      'objP_Extra_Life_01',
-      'objP_Extra_Life_02',
-      'objP_Extra_Life_03',
-      'objP_Extra_Life_04',
-    ]
-
-    let woodBallList = [];
-    let paperBallList = [];
-
-    let boxList = [
-      'objP_Box_01',
-      'objP_Box_02',
-      'objP_Box_03',
-      'objP_Box_04',
-      'objP_Box_05',
-      'objP_Box_06',
-    ]
-
-    createBall();
     level1.children.forEach((obj, index) => {
-      if (!hiddenList.includes(obj.name)) {
+      if (!HIDDEN_LIST.includes(obj.name)) {
         setTimeout(() => {
-          if (extraLifeList.includes(obj.name)) {
+          if (
+            EXTRA_LIFE_LIST.includes(obj.name) ||
+            EXTRA_POINT_LIST.includes(obj.name) ||
+            RESET_POINT_LIST.includes(obj.name)
+            // TRAFO_STONE_LIST.includes(obj.name) ||
+            // TRAFO_WOOD_LIST.includes(obj.name) ||
+            // TRAFO_PAPER_LIST.includes(obj.name)
+          ) {
             return;
           }
-          if (boxList.includes(obj.name)) {
+          if (BOX_LIST.includes(obj.name)) {
 
             let pos = new THREE.Vector3();
             let quat = new THREE.Quaternion();
@@ -313,12 +277,38 @@ Ammo().then(function (Ammo) {
             pos.set(offset.x, offset.y, offset.z);
             quat.set(0, 0, 0, 1);
             createRigidBody(obj, collisionShape, 5, pos, quat);
+          } else if (
+            BALL_PAPER_LIST.includes(obj.name) ||
+            BALL_STONE_LIST.includes(obj.name) ||
+            BALL_WOOD_LIST.includes(obj.name)) {
+
+            let pos = new THREE.Vector3();
+            let quat = new THREE.Quaternion();
+            const v = new THREE.Vector3();
+
+            obj.geometry.computeBoundingBox();
+            let bBox = obj.geometry.boundingBox.clone();
+
+            const btHalfExtents = new Ammo.btVector3(bBox.size().x / 2, bBox.size().y / 2, bBox.size().z / 2);
+            const collisionShape = new Ammo.btBoxShape(btHalfExtents);
+
+            const offset = bBox.center();
+
+            obj.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(
+              -offset.x, -offset.y, -offset.z));
+
+            pos.set(offset.x, offset.y, offset.z);
+            quat.set(0, 0, 0, 1);
+            createRigidBody(obj, collisionShape, 0.5, pos, quat);
           } else {
             threeToAmmo(obj)
           }
         }, 0)
       }
-    })
+    });
+    setTimeout(() => {
+      createBall();
+    }, 0)
   }
 
   function threeToAmmo(obj, mass = 0) {
@@ -510,9 +500,6 @@ Ammo().then(function (Ammo) {
         ms.getWorldTransform(transformAux1);
         var p = transformAux1.getOrigin();
         var q = transformAux1.getRotation();
-        if (objThree.name === 'objP_Box_01') {
-          console.log(p.x(), p.y(), p.z())
-        }
         objThree.position.set(p.x(), p.y(), p.z());
         objThree.quaternion.set(q.x(), q.y(), q.z(), q.w());
       }
