@@ -71,6 +71,9 @@ export const BOX_LIST = [
   'objP_Box_04',
   'objP_Box_05',
   'objP_Box_06',
+  'objP_Modul_01_01',
+  'objP_Modul_01_02',
+  'objP_Modul_34_01',
 ];
 
 export const TRAFO_STONE_LIST = [

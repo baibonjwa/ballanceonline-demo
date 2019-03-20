@@ -43,7 +43,7 @@ Ammo().then(function (Ammo) {
 
   // Physics variables
   // var gravityConstant = -9.8;
-  var gravityConstant = -50;
+  var gravityConstant = -60;
   var collisionConfiguration;
   var dispatcher;
   var broadphase;
