@@ -244,6 +244,40 @@ Ammo().then(function (Ammo) {
   }
 
   function createObjects() {
+
+    let skyGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
+    let cubeMaterials = [
+      new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load("./textures/Sky/Sky_A_Front.BMP"),
+        side: THREE.DoubleSide
+      }),
+      new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load("./textures/Sky/Sky_A_Back.BMP"),
+        side: THREE.DoubleSide
+      }),
+      new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load("./textures/Sky/Sky_A_Up.BMP"),
+        side: THREE.DoubleSide
+      }),
+      new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load("./textures/Sky/Sky_A_Down.BMP"),
+        side: THREE.DoubleSide
+      }),
+      new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load("./textures/Sky/Sky_A_Left.BMP"),
+        side: THREE.DoubleSide
+      }),
+      new THREE.MeshBasicMaterial({
+        map: new THREE.TextureLoader().load("./textures/Sky/Sky_A_Right.BMP"),
+        side: THREE.DoubleSide
+      }),
+    ];
+
+    let cubeMaterial = THREE.MeshFaceMaterial( cubeMaterials );
+    let skyBox = new THREE.Mesh( skyGeometry, cubeMaterial );
+    scene.add(skyBox);
+
+
     level1.children.forEach((obj, index) => {
       if (!HIDDEN_LIST.includes(obj.name)) {
         setTimeout(() => {
