@@ -3,6 +3,7 @@ export const HIDDEN_LIST = [
   'objQuader02',
   'objQuader03',
   'objQuader04',
+  'objSkyLayer',
 ]
 
 export const RESET_POINT_LIST = [

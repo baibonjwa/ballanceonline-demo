@@ -245,38 +245,39 @@ Ammo().then(function (Ammo) {
 
   function createObjects() {
 
-    let skyGeometry = new THREE.CubeGeometry(10000, 10000, 10000);
+    let skyGeometry = new THREE.CubeGeometry(1920, 1080, 1920);
     let cubeMaterials = [
       new THREE.MeshBasicMaterial({
-        map: new THREE.TextureLoader().load("./textures/Sky/Sky_A_Front.BMP"),
+        map: new THREE.TextureLoader().load("./models/obj/level1/textures/Sky/Sky_L_Front.BMP"),
         side: THREE.DoubleSide
       }),
       new THREE.MeshBasicMaterial({
-        map: new THREE.TextureLoader().load("./textures/Sky/Sky_A_Back.BMP"),
+        map: new THREE.TextureLoader().load("./models/obj/level1/textures/Sky/Sky_L_Back.BMP"),
         side: THREE.DoubleSide
       }),
       new THREE.MeshBasicMaterial({
-        map: new THREE.TextureLoader().load("./textures/Sky/Sky_A_Up.BMP"),
+        map: new THREE.TextureLoader().load("./models/obj/level1/textures/Sky/Sky_L_Up.BMP"),
         side: THREE.DoubleSide
       }),
       new THREE.MeshBasicMaterial({
-        map: new THREE.TextureLoader().load("./textures/Sky/Sky_A_Down.BMP"),
+        map: new THREE.TextureLoader().load("./models/obj/level1/textures/Sky/Sky_L_Down.BMP"),
         side: THREE.DoubleSide
       }),
       new THREE.MeshBasicMaterial({
-        map: new THREE.TextureLoader().load("./textures/Sky/Sky_A_Left.BMP"),
+        map: new THREE.TextureLoader().load("./models/obj/level1/textures/Sky/Sky_L_Left.BMP"),
         side: THREE.DoubleSide
       }),
       new THREE.MeshBasicMaterial({
-        map: new THREE.TextureLoader().load("./textures/Sky/Sky_A_Right.BMP"),
+        map: new THREE.TextureLoader().load("./models/obj/level1/textures/Sky/Sky_L_Right.BMP"),
         side: THREE.DoubleSide
       }),
     ];
 
     let cubeMaterial = THREE.MeshFaceMaterial( cubeMaterials );
     let skyBox = new THREE.Mesh( skyGeometry, cubeMaterial );
+    skyBox.position.set(360, 0, 525)
+    // skyBox.position.set(200, -300, 225)
     scene.add(skyBox);
-
 
     level1.children.forEach((obj, index) => {
       if (!HIDDEN_LIST.includes(obj.name)) {
