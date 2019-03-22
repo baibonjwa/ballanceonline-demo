@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "cssnano": "^4.1.10",
+    "parcel": "^1.12.3",
     "parcel-plugin-static-files-copy": "^2.0.0"
   },
   "staticFiles": {
