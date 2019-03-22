@@ -8,8 +8,19 @@
 <body class="main">
   <div id="container">
   </div>
-  <script src="https://s3.ap-northeast-1.amazonaws.com/assm-lib/ammo.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/101/three.min.js"></script>
+  <script>
+    function loadNonLocalScriptSync(href) {
+      var f=document.getElementsByTagName('script')[0],
+          j=document.createElement('script');
+      // Simulate <script> faithfully
+      j.async=false;
+      j.src=href;
+      f.parentNode.insertBefore(j,f);
+    };
+
+    loadNonLocalScriptSync('./three.min.js');
+    loadNonLocalScriptSync('./ammo.js');
+  </script>
   <script src="./index.js"></script>
 </body>
 </html>
