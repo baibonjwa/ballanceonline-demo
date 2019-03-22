@@ -7,7 +7,6 @@ coverage
 dist
 .vscode/
 .idea/
-*.min.js
 # Logs
 logs
 *.log
