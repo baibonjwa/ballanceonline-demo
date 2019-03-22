@@ -216,7 +216,7 @@ Ammo().then(function (Ammo) {
 
   function createBall() {
     var loader = new THREE.TextureLoader();
-    loader.load( './models/obj/level1/Textures/Ball_Wood.bmp', function ( texture ) {
+    loader.load( './models/obj/level1/textures/Ball_Wood.bmp', function ( texture ) {
       let pos = new THREE.Vector3();
       let quat = new THREE.Quaternion();
 
