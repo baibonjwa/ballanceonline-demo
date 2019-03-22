@@ -256,11 +256,11 @@ Ammo().then(function (Ammo) {
         side: THREE.DoubleSide
       }),
       new THREE.MeshBasicMaterial({
-        map: new THREE.TextureLoader().load("./models/obj/level1/textures/Sky/Sky_L_Up.BMP"),
+        map: new THREE.TextureLoader().load("./models/obj/level1/textures/Sky/Sky_L_Down.BMP"),
         side: THREE.DoubleSide
       }),
       new THREE.MeshBasicMaterial({
-        map: new THREE.TextureLoader().load("./models/obj/level1/textures/Sky/Sky_L_Down.BMP"),
+        map: new THREE.TextureLoader().load("./models/obj/level1/textures/Sky/Sky_L_Down2.BMP"),
         side: THREE.DoubleSide
       }),
       new THREE.MeshBasicMaterial({
