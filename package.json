@@ -15,7 +15,8 @@
     "three": "^0.91.0"
   },
   "scripts": {
-    "start": "node start.js"
+    "start": "node start.js",
+    "build": "parcel build index.html"
   },
   "devDependencies": {
     "cssnano": "^4.1.10",

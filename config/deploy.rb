@@ -16,9 +16,11 @@ set :repository, 'git@github.com:tlbai/ballanceonline.git'
 set :branch, 'master'
 
 # Optional settings:
-#   set :user, 'foobar'          # Username in the server to SSH to.
+set :user, 'happybai'          # Username in the server to SSH to.
 #   set :port, '30000'           # SSH port number.
 #   set :forward_agent, true     # SSH forward_agent.
+
+set :nvm_path, '/home/happybai/.nvm/scripts/nvm'
 
 # Shared dirs and files will be symlinked into the app-folder by the 'deploy:link_shared_paths' step.
 # Some plugins already add folders to shared_dirs like `mina/rails` add `public/assets`, `vendor/bundle` and many more
@@ -35,6 +37,12 @@ task :remote_environment do
 
   # For those using RVM, use this to load an RVM version@gemset.
   # invoke :'rvm:use', 'ruby-1.9.3-p125@default'
+  command 'echo "-----> Loading nvm"'
+  command %{
+    source ~/.nvm/nvm.sh
+  }
+  command 'echo "-----> Now using nvm v.`nvm --version`"'
+  command 'export PATH="$HOME/.yarn/bin:$PATH"'
 end
 
 # Put any custom commands you need to run at setup
@@ -51,6 +59,9 @@ task :deploy do
     # Put things that will set up an empty directory into a fully set-up
     # instance of your project.
     invoke :'git:clone'
+    command "nvm use node 9.3.0"
+    command "yarn install"
+    command "yarn build"
     invoke :'deploy:link_shared_paths'
     invoke :'deploy:cleanup'
 
