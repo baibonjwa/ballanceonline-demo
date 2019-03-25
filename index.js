@@ -63,11 +63,11 @@ Ammo().then(function (Ammo) {
   var objLoader = new THREE.OBJLoader();
   var mtlLoader = new THREE.MTLLoader();
   mtlLoader.setPath("/models/obj/level1/");
-  mtlLoader.load( 'level1-3.mtl', function( materials ) {
+  mtlLoader.load( 'level1-5.mtl', function( materials ) {
     materials.preload();
     objLoader.setPath("/models/obj/level1/");
     objLoader.setMaterials( materials )
-    objLoader.load('level1-3.obj', function (obj) {
+    objLoader.load('level1-5.obj', function (obj) {
       level1 = obj
       init();
       animate();
@@ -260,7 +260,7 @@ Ammo().then(function (Ammo) {
         side: THREE.DoubleSide
       }),
       new THREE.MeshBasicMaterial({
-        map: new THREE.TextureLoader().load("./models/obj/level1/textures/Sky/Sky_L_Down2.BMP"),
+        map: new THREE.TextureLoader().load("./models/obj/level1/textures/Sky/Sky_L_Down.BMP"),
         side: THREE.DoubleSide
       }),
       new THREE.MeshBasicMaterial({
