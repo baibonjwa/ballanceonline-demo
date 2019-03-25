@@ -19,6 +19,7 @@ import {
   EXTRA_LIFE_LIST,
   HIDDEN_LIST,
   EXTRA_POINT_LIST,
+  MODULE_LIST,
   TRAFO_STONE_LIST,
   TRAFO_WOOD_LIST,
   TRAFO_PAPER_LIST,
@@ -279,71 +280,140 @@ Ammo().then(function (Ammo) {
     // skyBox.position.set(200, -300, 225)
     scene.add(skyBox);
 
+    loadStaticObjects();
+    setTimeout(() => {
+      createBall();
+      loadDynamicObjects();
+    }, 0)
+  }
+
+  function loadDynamicObjects() {
+    level1.children.forEach((obj, index) => {
+      console.log(obj.name);
+      if (!HIDDEN_LIST.includes(obj.name)) {
+        setTimeout(() => {
+          if (BOX_LIST.includes(obj.name)) {
+
+            threeToAmmo(obj, 1)
+            // let pos = new THREE.Vector3();
+            // let quat = new THREE.Quaternion();
+
+            // obj.geometry.computeBoundingBox();
+            // let bBox = obj.geometry.boundingBox.clone();
+
+            // const btHalfExtents = new Ammo.btVector3(bBox.size().x / 2, bBox.size().y / 2, bBox.size().z / 2);
+            // const collisionShape = new Ammo.btBoxShape(btHalfExtents);
+
+            // const offset = bBox.center();
+
+            // obj.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(
+            //   -offset.x, -offset.y, -offset.z));
+
+            // pos.set(offset.x, offset.y, offset.z);
+            // quat.set(0, 0, 0, 1);
+            // createRigidBody(obj, collisionShape, 5, pos, quat);
+          }
+          if (
+            MODULE_LIST.includes(obj.name)
+          ) {
+            // let pos = new THREE.Vector3();
+            // let quat = new THREE.Quaternion();
+
+            // obj.geometry.computeBoundingBox();
+            // let bBox = obj.geometry.boundingBox.clone();
+
+            // const btHalfExtents = new Ammo.btVector3(bBox.size().x / 7, bBox.size().y / 2, bBox.size().z / 2);
+            // const collisionShape = new Ammo.btBoxShape(btHalfExtents);
+
+            // const offset = bBox.center();
+
+            // obj.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(
+            //   -offset.x, -offset.y, -offset.z));
+
+            // pos.set(offset.x, offset.y, offset.z);
+            // quat.set(0, 0, 0, 1);
+            // createRigidBody(obj, collisionShape, 5, pos, quat, 0.9, 0,9);
+            threeToAmmo(obj, 1)
+            // threeToConvexHullShape(obj);
+          }
+          if (
+            BALL_PAPER_LIST.includes(obj.name) ||
+            BALL_STONE_LIST.includes(obj.name) ||
+            BALL_WOOD_LIST.includes(obj.name)) {
+
+            threeToAmmo(obj, 1);
+            // let pos = new THREE.Vector3();
+            // let quat = new THREE.Quaternion();
+            // const v = new THREE.Vector3();
+
+            // obj.geometry.computeBoundingBox();
+            // let bBox = obj.geometry.boundingBox.clone();
+
+            // const btHalfExtents = new Ammo.btVector3(bBox.size().x / 2, bBox.size().y / 2, bBox.size().z / 2);
+            // const collisionShape = new Ammo.btBoxShape(btHalfExtents);
+
+            // const offset = bBox.center();
+
+            // obj.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(
+            //   -offset.x, -offset.y, -offset.z));
+
+            // pos.set(offset.x, offset.y, offset.z);
+            // quat.set(0, 0, 0, 1);
+            // createRigidBody(obj, collisionShape, 0.5, pos, quat);
+          }
+        }, 0)
+      }
+    });
+  }
+
+  function loadStaticObjects() {
     level1.children.forEach((obj, index) => {
       if (!HIDDEN_LIST.includes(obj.name)) {
+        console.log(obj.name)
         setTimeout(() => {
           if (
             EXTRA_LIFE_LIST.includes(obj.name) ||
             EXTRA_POINT_LIST.includes(obj.name) ||
-            RESET_POINT_LIST.includes(obj.name)
+            RESET_POINT_LIST.includes(obj.name) ||
+            BOX_LIST.includes(obj.name) ||
+            BALL_PAPER_LIST.includes(obj.name) ||
+            BALL_STONE_LIST.includes(obj.name) ||
+            BALL_WOOD_LIST.includes(obj.name) ||
+            MODULE_LIST.includes(obj.name)
             // TRAFO_STONE_LIST.includes(obj.name) ||
             // TRAFO_WOOD_LIST.includes(obj.name) ||
             // TRAFO_PAPER_LIST.includes(obj.name)
           ) {
             return;
           }
-          if (BOX_LIST.includes(obj.name)) {
-
-            let pos = new THREE.Vector3();
-            let quat = new THREE.Quaternion();
-            const v = new THREE.Vector3();
-
-            obj.geometry.computeBoundingBox();
-            let bBox = obj.geometry.boundingBox.clone();
-
-            const btHalfExtents = new Ammo.btVector3(bBox.size().x / 2, bBox.size().y / 2, bBox.size().z / 2);
-            const collisionShape = new Ammo.btBoxShape(btHalfExtents);
-
-            const offset = bBox.center();
-
-            obj.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(
-              -offset.x, -offset.y, -offset.z));
-
-            pos.set(offset.x, offset.y, offset.z);
-            quat.set(0, 0, 0, 1);
-            createRigidBody(obj, collisionShape, 5, pos, quat);
-          } else if (
-            BALL_PAPER_LIST.includes(obj.name) ||
-            BALL_STONE_LIST.includes(obj.name) ||
-            BALL_WOOD_LIST.includes(obj.name)) {
-
-            let pos = new THREE.Vector3();
-            let quat = new THREE.Quaternion();
-            const v = new THREE.Vector3();
-
-            obj.geometry.computeBoundingBox();
-            let bBox = obj.geometry.boundingBox.clone();
-
-            const btHalfExtents = new Ammo.btVector3(bBox.size().x / 2, bBox.size().y / 2, bBox.size().z / 2);
-            const collisionShape = new Ammo.btBoxShape(btHalfExtents);
-
-            const offset = bBox.center();
-
-            obj.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(
-              -offset.x, -offset.y, -offset.z));
-
-            pos.set(offset.x, offset.y, offset.z);
-            quat.set(0, 0, 0, 1);
-            createRigidBody(obj, collisionShape, 0.5, pos, quat);
-          } else {
-            threeToAmmo(obj)
-          }
+          threeToAmmo(obj)
         }, 0)
       }
     });
-    setTimeout(() => {
-      createBall();
-    }, 0)
+  }
+
+  function threeToConvexHullShape(obj, mass = 0) {
+    let pos = new THREE.Vector3();
+    let quat = new THREE.Quaternion();
+    let scale = new THREE.Vector3();
+
+    if (mass > 0) {
+      obj.geometry.computeBoundingBox();
+      let offset = obj.geometry.boundingBox.center();
+      obj.geometry.applyMatrix(new THREE.Matrix4().makeTranslation(
+        -offset.x, -offset.y, -offset.z));
+      pos.set(offset.x, offset.y + 200, offset.z);
+    }
+
+    var geometry = new THREE.Geometry().fromBufferGeometry(obj.geometry);
+    var vertices = geometry.vertices;
+
+    var shape = new Ammo.btConvexHullShape(vertices);
+    shape.setMargin(margin)
+
+    const localScale = new Ammo.btVector3(obj.scale.x, obj.scale.y, obj.scale.z);
+    shape.setLocalScaling(localScale);
+    return createRigidBody(obj, shape, mass, pos, quat);
   }
 
   function threeToAmmo(obj, mass = 0) {
@@ -451,11 +521,19 @@ Ammo().then(function (Ammo) {
       }
 
       // var shape = new Ammo.btBvhTriangleMeshShape(
-      var shape = new Ammo.btBvhTriangleMeshShape(
-        triangle_mesh,
-        true,
-        true,
-      );
+      // var shape = new Ammo.btBvhTriangleMeshShape(
+      if ( mass === 0) {
+        var shape = new Ammo.btBvhTriangleMeshShape(
+          triangle_mesh,
+          true,
+          true,
+        );
+      } else {
+        var shape = new Ammo.btConvexTriangleMeshShape(
+          triangle_mesh,
+          true,
+        );
+      }
       shape.setMargin(margin);
       // todo: it's very bad to setLocalScaling on the shape after initializing, causing a needless BVH recalc --
       // we should be using triMesh.setScaling prior to building the BVH
@@ -488,7 +566,7 @@ Ammo().then(function (Ammo) {
     });
   }
 
-  function createRigidBody(threeObject, physicsShape, mass, pos, quat) {
+  function createRigidBody(threeObject, physicsShape, mass, pos, quat, friction=0.5, rollingFriction=0.5, damping=0.5) {
 
     threeObject.position.copy(pos);
     threeObject.quaternion.copy(quat);
@@ -506,8 +584,9 @@ Ammo().then(function (Ammo) {
     var body = new Ammo.btRigidBody(rbInfo);
 
     threeObject.userData.physicsBody = body;
-    body.setFriction(0.4);
-    body.setRollingFriction(0.4);
+    body.setFriction(friction);
+    body.setRollingFriction(rollingFriction);
+    body.setDamping(damping, damping);
 
     scene.add(threeObject);
 
@@ -572,13 +651,26 @@ Ammo().then(function (Ammo) {
   function updateCamera(deltaTime) {
     controls.update(deltaTime);
 
+    // let pos = new THREE.Vector3 (
+    //   267.6221923828125,
+    //   7.0855865478515625,
+    //   797.2139892578125
+    // )
+
+    // camera.position.set(
+    //   pos.x + cameraRelativePosition.x,
+    //   pos.y + cameraRelativePosition.y,
+    //   pos.z + cameraRelativePosition.z + 100,
+    // )
+
     if (ball) {
-      camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
-      controls.target = new THREE.Vector3(
+      let pos = new THREE.Vector3(
         ball.position.x,
         ball.position.y,
         ball.position.z
       )
+      camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
+      controls.target = pos;
     }
   }
 

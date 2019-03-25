@@ -4,6 +4,7 @@ export const HIDDEN_LIST = [
   'objQuader03',
   'objQuader04',
   'objSkyLayer',
+  'P_Modul_01_Filler',
 ]
 
 export const RESET_POINT_LIST = [
@@ -72,10 +73,13 @@ export const BOX_LIST = [
   'objP_Box_04',
   'objP_Box_05',
   'objP_Box_06',
-  'objP_Modul_01_01',
-  'objP_Modul_01_02',
-  'objP_Modul_34_01',
+  'objP_Box_07',
 ];
+
+export const MODULE_LIST = [
+  'P_Modul_01_Pusher_01',
+  'P_Modul_01_Pusher_02',
+]
 
 export const TRAFO_STONE_LIST = [
   'objP_Trafo_Stone_01',
