@@ -103,7 +103,12 @@ Ammo().then(function (Ammo) {
     DEBUG_MODE = true;
     GAME_STATUS = 'debug';
     controls.autoRotate = false;
+    controls.enableKeys = true;
+    controls.enablePan = true;
+    controls.enableRotate = true;
+    controls.enableZoom = true;
     debugDrawer.enable();
+    // controls.autoRotateSpeed = 1;
     // init();
     // animate(true);
   }
@@ -126,30 +131,39 @@ Ammo().then(function (Ammo) {
   const VELOCITY = 20;
 
   keyboardJS.bind(['d', 'right'], (e) => {
-    let v = ballBody.getLinearVelocity()
-    ballBody.setLinearVelocity(new Ammo.btVector3(v.x(), v.y(), VELOCITY));
-    // console.log(ball.position)
+    if (GAME_STATUS === 'start') {
+      let v = ballBody.getLinearVelocity()
+      ballBody.setLinearVelocity(new Ammo.btVector3(v.x(), v.y(), VELOCITY));
+    }
   });
 
   keyboardJS.bind(['a', 'left'], (e) => {
-    let v = ballBody.getLinearVelocity()
-    ballBody.setLinearVelocity(new Ammo.btVector3(v.x(), v.y(), -VELOCITY));
+    if (GAME_STATUS === 'start') {
+      let v = ballBody.getLinearVelocity()
+      ballBody.setLinearVelocity(new Ammo.btVector3(v.x(), v.y(), -VELOCITY));
+    }
   });
 
   keyboardJS.bind(['w', 'up'], (e) => {
-    let v = ballBody.getLinearVelocity()
-    ballBody.setLinearVelocity(new Ammo.btVector3(VELOCITY, v.y(), v.z()));
+    if (GAME_STATUS === 'start') {
+      let v = ballBody.getLinearVelocity()
+      ballBody.setLinearVelocity(new Ammo.btVector3(VELOCITY, v.y(), v.z()));
+    }
   });
 
   keyboardJS.bind(['s', 'down'], (e) => {
-    let v = ballBody.getLinearVelocity()
-    ballBody.setLinearVelocity(new Ammo.btVector3(-VELOCITY, v.y(), v.z()));
+    if (GAME_STATUS === 'start') {
+      let v = ballBody.getLinearVelocity()
+      ballBody.setLinearVelocity(new Ammo.btVector3(-VELOCITY, v.y(), v.z()));
+    }
   });
 
   keyboardJS.bind(['space'], () => {
-    ballBody.setLinearVelocity(new Ammo.btVector3(0, 20, 0));
-    // eslint-disable-next-line no-console
-    console.log(ball.position)
+    if (GAME_STATUS === 'start') {
+      ballBody.setLinearVelocity(new Ammo.btVector3(0, 20, 0));
+      // eslint-disable-next-line no-console
+      console.log(ball.position)
+    }
   });
 
   // keyboardJS.bind(['shift+up'], () => {
@@ -182,13 +196,17 @@ Ammo().then(function (Ammo) {
       507.9201354980469
     )
     camera.position.set(
-      pos.x + 50,
-      pos.y + 40,
-      pos.z + 50,
+      pos.x + 40,
+      pos.y + 20,
+      pos.z + 40,
     );
 
     controls = new THREE.OrbitControls(camera);
     controls.autoRotate = true;
+    controls.enableKeys = false;
+    controls.enablePan = false;
+    controls.enableRotate = false;
+    controls.enableZoom = false;
     // controls.autoRotateSpeed = 1;
     // .autoRotateSpeed
     // controls.target.y = 2;

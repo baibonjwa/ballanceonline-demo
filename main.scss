@@ -15,12 +15,14 @@ body {
   background-color: rgba(0, 0, 0, 0.3);
   width: 400px;
   margin: 0 auto;
+  padding-top: 10px;
   height: inherit;
   /* box-shadow: -3px 0px 10px 0px #3b342b inset,3px 0px 10px 0px #3b342b inset; */
   border-left: 5px solid rgba(59, 52, 41, 0.6);
   border-right: 5px solid rgba(59, 52, 41, 0.6);
   color: #fff;
-  font-family: "Comic Sans MS", cursive, sans-serif
+  font-family: "Comic Sans MS", "cursive", "sans-serif";
+  text-align: center;
 }
 
 .wrapper .button-wrapper .flex-w {
