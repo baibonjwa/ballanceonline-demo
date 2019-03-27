@@ -113,6 +113,29 @@ Ammo().then(function (Ammo) {
     // animate(true);
   }
 
+  let help = document.getElementById('help');
+  help.onclick = () => {
+    document.querySelector('.flex-w').style.display = 'none';
+    document.querySelector('.help').style.display = 'block';
+    document.querySelector('.about').style.display = 'none';
+  }
+
+  let about = document.getElementById('about');
+  about.onclick = () => {
+    document.querySelector('.flex-w').style.display = 'none';
+    document.querySelector('.help').style.display = 'none';
+    document.querySelector('.about').style.display = 'block';
+  }
+
+  let handleBackClick = () => {
+    document.querySelector('.flex-w').style.display = 'flex';
+    document.querySelector('.help').style.display = 'none';
+    document.querySelector('.about').style.display = 'none';
+  }
+  let aboutBack = document.getElementById('about-back');
+  let helpBack = document.getElementById('help-back');
+  aboutBack.onclick = handleBackClick;
+  helpBack.onclick = handleBackClick;
 
   function init() {
     initCamera();

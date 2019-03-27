@@ -45,6 +45,7 @@ body {
   background-color: rgba(64, 55, 56, 0.5);
   border-radius: 25px;
   border: 1px solid #dbdbdb;
+  cursor: pointer;
 }
 
 .wrapper .button-item .ball {
@@ -109,4 +110,12 @@ body {
   height: 65px;
   top: -8px;
   left: -8px;
+}
+
+.wrapper .help, .wrapper .about {
+  padding-top: 20px;
+}
+
+.wrapper .back {
+  margin-top: 80px !important;
 }
