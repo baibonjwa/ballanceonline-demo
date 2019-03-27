@@ -59,7 +59,7 @@ task :deploy do
     # Put things that will set up an empty directory into a fully set-up
     # instance of your project.
     invoke :'git:clone'
-    command "nvm use node 9.3.0"
+    command "nvm use node 10.15.3"
     command "yarn install"
     command "yarn build"
     invoke :'deploy:link_shared_paths'
