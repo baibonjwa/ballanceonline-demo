@@ -28,9 +28,12 @@ import {
   RESET_POINT_LIST,
 } from './levels/level1';
 
-const DEBUG_MODE = false;
+// let DEBUG_MODE = true;
 
 Ammo().then(function (Ammo) {
+
+  let DEBUG_MODE = false;
+  let GAME_STATUS = 'initial';
 
   let container;
   let clock = new THREE.Clock();
@@ -63,11 +66,11 @@ Ammo().then(function (Ammo) {
   let objLoader = new THREE.OBJLoader();
   let mtlLoader = new THREE.MTLLoader();
   mtlLoader.setPath("/models/obj/level1/");
-  mtlLoader.load( 'level1-5.mtl', function( materials ) {
+  mtlLoader.load( 'level1-6.mtl', function( materials ) {
     materials.preload();
     objLoader.setPath("/models/obj/level1/");
     objLoader.setMaterials( materials )
-    objLoader.load('level1-5.obj', function (obj) {
+    objLoader.load('level1-6.obj', function (obj) {
       level1 = obj
       init();
       animate();
@@ -82,6 +85,29 @@ Ammo().then(function (Ammo) {
       console.log('An error happened');
     })
   });
+
+  let start = document.getElementById('start');
+  start.onclick = () => {
+    let mainMenu = document.getElementById('main-menu');
+    mainMenu.style.display = 'none';
+    GAME_STATUS = 'start';
+    controls.autoRotate = false;
+    // init();
+    // animate();
+  }
+
+  let debug = document.getElementById('debug-mode');
+  debug.onclick = () => {
+    let mainMenu = document.getElementById('main-menu');
+    mainMenu.style.display = 'none';
+    DEBUG_MODE = true;
+    GAME_STATUS = 'debug';
+    controls.autoRotate = false;
+    debugDrawer.enable();
+    // init();
+    // animate(true);
+  }
+
 
   function init() {
     initCamera();
@@ -156,9 +182,9 @@ Ammo().then(function (Ammo) {
       507.9201354980469
     )
     camera.position.set(
-      pos.x + 100,
-      pos.y + 100,
-      pos.z + 100,
+      pos.x + 50,
+      pos.y + 40,
+      pos.z + 50,
     );
 
     controls = new THREE.OrbitControls(camera);
@@ -448,14 +474,15 @@ Ammo().then(function (Ammo) {
         );
       }
 
+      let shape;
       if ( mass === 0) {
-        var shape = new Ammo.btBvhTriangleMeshShape(
+        shape = new Ammo.btBvhTriangleMeshShape(
           triangle_mesh,
           true,
           true,
         );
       } else {
-        var shape = new Ammo.btConvexTriangleMeshShape(
+        shape = new Ammo.btConvexTriangleMeshShape(
           triangle_mesh,
           true,
         );
@@ -555,7 +582,7 @@ Ammo().then(function (Ammo) {
 
     var deltaTime = clock.getDelta();
 
-    // updatePhysics(deltaTime);
+    updatePhysics(deltaTime);
 
     updateCamera(deltaTime);
 
@@ -575,13 +602,15 @@ Ammo().then(function (Ammo) {
     //   797.2139892578125
     // )
 
-    let pos = new THREE.Vector3 (
-      74.78809356689453,
-      10.729013442993164,
-      507.9201354980469
-    )
     controls.update(deltaTime);
-    controls.target = pos;
+    if (GAME_STATUS === 'initial') {
+      let pos = new THREE.Vector3 (
+        74.78809356689453,
+        10.729013442993164,
+        507.9201354980469
+      )
+      controls.target = pos;
+    }
 
     // camera.position.set(
     //   pos.x + cameraRelativePosition.x,
@@ -610,15 +639,15 @@ Ammo().then(function (Ammo) {
     //   camera.lookAt(ball.position);
     // }
 
-    // if (ball) {
-    //   let pos = new THREE.Vector3(
-    //     ball.position.x,
-    //     ball.position.y,
-    //     ball.position.z
-    //   )
-    //   camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
-    //   controls.target = pos;
-    // }
+    if (ball && GAME_STATUS == 'start') {
+      let pos = new THREE.Vector3(
+        ball.position.x,
+        ball.position.y,
+        ball.position.z
+      )
+      camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
+      controls.target = pos;
+    }
   }
 
   window.addEventListener('resize', onWindowResize, false);
