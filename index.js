@@ -56,7 +56,7 @@ Ammo().then(function (Ammo) {
   let rigidBodies = [];
   let margin = 0.05;
   let transformAux1 = new Ammo.btTransform();
-  let time = 0;
+  // let time = 0;
 
   let debugDrawer;
 
@@ -77,11 +77,14 @@ Ammo().then(function (Ammo) {
     },
     // called while loading is progressing
     function (xhr) {
+      // eslint-disable-next-line no-console
       console.log((xhr.loaded / xhr.total * 100) + '% loaded');
     },
     // called when loading has errors
     function (error) {
+      // eslint-disable-next-line no-console
       console.log(error);
+      // eslint-disable-next-line no-console
       console.log('An error happened');
     })
   });
@@ -153,28 +156,28 @@ Ammo().then(function (Ammo) {
 
   const VELOCITY = 20;
 
-  keyboardJS.bind(['d', 'right'], (e) => {
+  keyboardJS.bind(['d', 'right'], () => {
     if (GAME_STATUS === 'start') {
       let v = ballBody.getLinearVelocity()
       ballBody.setLinearVelocity(new Ammo.btVector3(v.x(), v.y(), VELOCITY));
     }
   });
 
-  keyboardJS.bind(['a', 'left'], (e) => {
+  keyboardJS.bind(['a', 'left'], () => {
     if (GAME_STATUS === 'start') {
       let v = ballBody.getLinearVelocity()
       ballBody.setLinearVelocity(new Ammo.btVector3(v.x(), v.y(), -VELOCITY));
     }
   });
 
-  keyboardJS.bind(['w', 'up'], (e) => {
+  keyboardJS.bind(['w', 'up'], () => {
     if (GAME_STATUS === 'start') {
       let v = ballBody.getLinearVelocity()
       ballBody.setLinearVelocity(new Ammo.btVector3(VELOCITY, v.y(), v.z()));
     }
   });
 
-  keyboardJS.bind(['s', 'down'], (e) => {
+  keyboardJS.bind(['s', 'down'], () => {
     if (GAME_STATUS === 'start') {
       let v = ballBody.getLinearVelocity()
       ballBody.setLinearVelocity(new Ammo.btVector3(-VELOCITY, v.y(), v.z()));
@@ -414,7 +417,7 @@ Ammo().then(function (Ammo) {
   function threeToAmmo(obj, mass = 0) {
     let pos = new THREE.Vector3();
     let quat = new THREE.Quaternion();
-    let scale = new THREE.Vector3();
+    // let scale = new THREE.Vector3();
 
     if (mass > 0) {
       obj.geometry.computeBoundingBox();
@@ -540,19 +543,19 @@ Ammo().then(function (Ammo) {
     }
   }
 
-  function createParalellepiped(sx, sy, sz, mass, pos, quat, material) {
+  // function createParalellepiped(sx, sy, sz, mass, pos, quat, material) {
 
-    var threeObject = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
-    var shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
-    shape.setMargin(margin);
-    createRigidBody(threeObject, shape, mass, pos, quat);
+  //   var threeObject = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
+  //   var shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
+  //   shape.setMargin(margin);
+  //   createRigidBody(threeObject, shape, mass, pos, quat);
 
-    return threeObject;
-  }
+  //   return threeObject;
+  // }
 
-  function createRandomColor() {
-    return Math.floor(Math.random() * (1 << 24));
-  }
+  // function createRandomColor() {
+  //   return Math.floor(Math.random() * (1 << 24));
+  // }
 
   function createRigidBody(threeObject, physicsShape, mass, pos, quat, friction=0.5, rollingFriction=0.5, damping=0.5) {
 
@@ -629,7 +632,7 @@ Ammo().then(function (Ammo) {
 
     renderer.render(scene, camera);
 
-    time += deltaTime;
+    // time += deltaTime;
 
     if (debugDrawer && DEBUG_MODE) debugDrawer.update();
 
