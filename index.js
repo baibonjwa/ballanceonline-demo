@@ -1,3 +1,4 @@
+/* global Ammo */
 import './main.scss'
 
 import * as THREE from 'three';
@@ -10,8 +11,8 @@ import './lib/MTLLoader';
 import './lib/AmmoDebugDrawer';
 import './lib/GeometryUtils';
 import Stats from 'stats-js';
-import * as TWEEN from '@tweenjs/tween.js';
-import _ from 'lodash';
+// import * as TWEEN from '@tweenjs/tween.js';
+// import _ from 'lodash';
 import {
   BOX_LIST,
   BALL_PAPER_LIST,
@@ -21,49 +22,46 @@ import {
   HIDDEN_LIST,
   EXTRA_POINT_LIST,
   MODULE_LIST,
-  TRAFO_STONE_LIST,
-  TRAFO_WOOD_LIST,
-  TRAFO_PAPER_LIST,
+  // TRAFO_STONE_LIST,
+  // TRAFO_WOOD_LIST,
+  // TRAFO_PAPER_LIST,
   RESET_POINT_LIST,
 } from './levels/level1';
+
+const DEBUG_MODE = false;
 
 Ammo().then(function (Ammo) {
 
   let container;
-  let textureLoader;
   let clock = new THREE.Clock();
 
-  let world, mass, body, shape, timeStep = 1 / 60;
   let camera, scene, renderer;
-  let geometry, material, mesh;
-  let light;
   let controls;
   let stats;
   let ball;
-  let bodies = [];
-  let tween;
+  // let tween;
 
   // Physics variables
   // var gravityConstant = -9.8;
-  var gravityConstant = -60;
-  var collisionConfiguration;
-  var dispatcher;
-  var broadphase;
-  var solver;
-  var softBodySolver;
-  var physicsWorld;
-  var rigidBodies = [];
-  var margin = 0.05;
-  var transformAux1 = new Ammo.btTransform();
-  var time = 0;
+  let gravityConstant = -60;
+  let collisionConfiguration;
+  let dispatcher;
+  let broadphase;
+  let solver;
+  let softBodySolver;
+  let physicsWorld;
+  let rigidBodies = [];
+  let margin = 0.05;
+  let transformAux1 = new Ammo.btTransform();
+  let time = 0;
 
-  var debugDrawer;
+  let debugDrawer;
 
-  var level1;
-  var ballBody;
+  let level1;
+  let ballBody;
 
-  var objLoader = new THREE.OBJLoader();
-  var mtlLoader = new THREE.MTLLoader();
+  let objLoader = new THREE.OBJLoader();
+  let mtlLoader = new THREE.MTLLoader();
   mtlLoader.setPath("/models/obj/level1/");
   mtlLoader.load( 'level1-5.mtl', function( materials ) {
     materials.preload();
@@ -124,6 +122,7 @@ Ammo().then(function (Ammo) {
 
   keyboardJS.bind(['space'], () => {
     ballBody.setLinearVelocity(new Ammo.btVector3(0, 20, 0));
+    // eslint-disable-next-line no-console
     console.log(ball.position)
   });
 
@@ -165,10 +164,8 @@ Ammo().then(function (Ammo) {
     controls = new THREE.OrbitControls(camera);
     controls.autoRotate = true;
     // controls.autoRotateSpeed = 1;
-    // .autoRotateSpeed 
+    // .autoRotateSpeed
     // controls.target.y = 2;
-
-
   }
 
 
@@ -176,18 +173,13 @@ Ammo().then(function (Ammo) {
 
     container = document.getElementById('container');
 
-
     scene = new THREE.Scene();
-
-
 
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0xbfd1e5);
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
-
-    textureLoader = new THREE.TextureLoader();
 
     var ambientLight = new THREE.AmbientLight(0x404040);
     scene.add(ambientLight);
@@ -310,7 +302,7 @@ Ammo().then(function (Ammo) {
   }
 
   function loadDynamicObjects() {
-    level1.children.forEach((obj, index) => {
+    level1.children.forEach((obj) => {
       if (!HIDDEN_LIST.includes(obj.name)) {
         setTimeout(() => {
           if (
@@ -328,7 +320,7 @@ Ammo().then(function (Ammo) {
   }
 
   function loadStaticObjects() {
-    level1.children.forEach((obj, index) => {
+    level1.children.forEach((obj) => {
       if (!HIDDEN_LIST.includes(obj.name)) {
         setTimeout(() => {
           if (
@@ -550,7 +542,7 @@ Ammo().then(function (Ammo) {
 
   function initDebug() {
     debugDrawer = new THREE.AmmoDebugDrawer(scene, physicsWorld);
-    // debugDrawer.enable();
+    if (DEBUG_MODE) debugDrawer.enable();
   }
 
   function animate() {
@@ -571,7 +563,7 @@ Ammo().then(function (Ammo) {
 
     time += deltaTime;
 
-    // if (debugDrawer) debugDrawer.update();
+    if (debugDrawer && DEBUG_MODE) debugDrawer.update();
 
   }
 
