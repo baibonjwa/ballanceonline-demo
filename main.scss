@@ -1,11 +1,16 @@
 body {
   margin: 0;
   padding: 0;
+  overflow: hidden;
+}
+
+.container {
+  overflow: hidden;
 }
 
 .wrapper {
   width: 100%;
-  height: calc(100vh - 15px);
+  height: calc(100vh - 10px);
   position: fixed;
   top: 0px;
 }
@@ -112,18 +117,14 @@ body {
   left: -8px;
 }
 
-.wrapper .help, .wrapper .about {
+.wrapper .help, .wrapper .about, .wrapper .lose, .wrapper .win {
   padding-top: 20px;
 }
 
-.wrapper .back, .wrapper .lose, .wrapper .win {
+.wrapper .back, .wrapper .retry, .wrapper .play-again {
   margin-top: 80px !important;
 }
 
-.wrapper .lose {
-  padding-top: 80px;
-}
-
 .wrapper .version {
-  margin-top: 70vh;
+  margin-top: 80vh;
 }
