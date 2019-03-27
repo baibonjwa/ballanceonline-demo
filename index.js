@@ -130,6 +130,14 @@ Ammo().then(function (Ammo) {
     document.querySelector('.about').style.display = 'block';
   }
 
+  let retry = document.getElementById('retry');
+  retry.onclick = () => {
+    let mainMenu = document.getElementById('main-menu');
+    mainMenu.style.display = 'none';
+    GAME_STATUS = 'retry';
+  }
+
+
   let handleBackClick = () => {
     document.querySelector('.flex-w').style.display = 'flex';
     document.querySelector('.help').style.display = 'none';
@@ -626,13 +634,33 @@ Ammo().then(function (Ammo) {
 
     var deltaTime = clock.getDelta();
 
-    updatePhysics(deltaTime);
+    if (GAME_STATUS === 'start') {
+      updatePhysics(deltaTime);
+    }
 
     updateCamera(deltaTime);
 
     renderer.render(scene, camera);
 
     // time += deltaTime;
+    if (GAME_STATUS === 'retry') {
+      let pos = new THREE.Vector3();
+      // Initial ball position
+      pos.set(54.134429931640625, 16.012664794921875, 153.05307006835938);
+      ball.position.copy(pos);
+      GAME_STATUS = 'start';
+      ball = null;
+      createBall();
+    }
+
+    if (ball && ball.position.y < -200 && GAME_STATUS === 'start') {
+      console.log(ball.position);
+      GAME_STATUS = 'lose';
+      let mainMenu = document.getElementById('main-menu');
+      mainMenu.style.display = 'block';
+      document.querySelector('.flex-w').style.display = 'none';
+      document.querySelector('.lose').style.display = 'block';
+    }
 
     if (debugDrawer && DEBUG_MODE) debugDrawer.update();
 

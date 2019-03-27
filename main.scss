@@ -5,7 +5,7 @@ body {
 
 .wrapper {
   width: 100%;
-  height: calc(100vh - 10px);
+  height: calc(100vh - 15px);
   position: fixed;
   top: 0px;
 }
@@ -116,10 +116,14 @@ body {
   padding-top: 20px;
 }
 
-.wrapper .back {
+.wrapper .back, .wrapper .lose, .wrapper .win {
   margin-top: 80px !important;
 }
 
+.wrapper .lose {
+  padding-top: 80px;
+}
+
 .wrapper .version {
-  margin-top: 80vh;
+  margin-top: 70vh;
 }
