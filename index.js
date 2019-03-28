@@ -111,6 +111,7 @@ Ammo().then(function (Ammo) {
     controls.enablePan = true;
     controls.enableRotate = true;
     controls.enableZoom = true;
+    controls.enableDamping = true;
     debugDrawer.enable();
     // controls.autoRotateSpeed = 1;
     // init();
@@ -249,7 +250,8 @@ Ammo().then(function (Ammo) {
     controls.enablePan = false;
     controls.enableRotate = false;
     controls.enableZoom = false;
-    // controls.autoRotateSpeed = 1;
+    controls.enableDamping = true;
+    controls.autoRotateSpeed = 0.7;
     // .autoRotateSpeed
     // controls.target.y = 2;
   }
@@ -670,7 +672,6 @@ Ammo().then(function (Ammo) {
       ball.position.y < -10 && ball.position.y > -15 &&
       ball.position.z < 875 && ball.position.z > 870 &&
       GAME_STATUS === 'start') {
-      console.log(ball.position);
       GAME_STATUS = 'win';
       let mainMenu = document.getElementById('main-menu');
       mainMenu.style.display = 'block';
@@ -680,7 +681,6 @@ Ammo().then(function (Ammo) {
     }
 
     if (ball && ball.position.y < -100 && GAME_STATUS === 'start') {
-      console.log(ball.position);
       GAME_STATUS = 'lose';
       let mainMenu = document.getElementById('main-menu');
       mainMenu.style.display = 'block';
