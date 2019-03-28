@@ -75,6 +75,7 @@ Ammo().then(function (Ammo) {
       level1 = obj
       init();
       animate();
+      document.getElementById('main-menu').style.display = 'block';
     },
     // called while loading is progressing
     function (xhr) {
@@ -693,6 +694,22 @@ Ammo().then(function (Ammo) {
 
   }
 
+  // function panCamera(xTarget,yTarget,zTarget,tweenDuration){
+
+  //   console.log(xTarget, yTarget, zTarget, tweenDuration);
+
+  //   // TWEEN.removeAll();
+
+  //   var camNewPosition= { x : xTarget, y : yTarget, z : zTarget};
+  //   var targetNewPos = {x : xTarget, y : yTarget, z : 0};
+
+  //   var camTween = new TWEEN.Tween(camera.position).to(camNewPosition, tweenDuration).easing(TWEEN.Easing.Quadratic.InOut).onUpdate(() => {
+  //   })
+  //   camTween.start();
+  //   var targetTween = new TWEEN.Tween(controls.target).to(targetNewPos, tweenDuration).easing(TWEEN.Easing.Quadratic.InOut).onUpdate(() => {
+  //   })
+  //   targetTween.start();
+  // }
 
   function updateCamera(deltaTime) {
     // let pos = new THREE.Vector3 (
@@ -744,6 +761,12 @@ Ammo().then(function (Ammo) {
         ball.position.y,
         ball.position.z
       )
+      // panCamera(
+      //   ball.position.x + cameraRelativePosition.x,
+      //   ball.position.y + cameraRelativePosition.y,
+      //   ball.position.z,
+      //   1000,
+      // )
       camera.position.set(ball.position.x + cameraRelativePosition.x, ball.position.y + cameraRelativePosition.y, ball.position.z)
       controls.target = pos;
     }
