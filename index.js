@@ -29,6 +29,7 @@ import {
 } from './levels/level1';
 
 // let DEBUG_MODE = true;
+// {x: 731.6364135742188, y: -13.190799713134766, z: 873.3243408203125}
 
 Ammo().then(function (Ammo) {
 
@@ -132,6 +133,13 @@ Ammo().then(function (Ammo) {
 
   let retry = document.getElementById('retry');
   retry.onclick = () => {
+    let mainMenu = document.getElementById('main-menu');
+    mainMenu.style.display = 'none';
+    GAME_STATUS = 'retry';
+  }
+
+  let playAgain = document.getElementById('play-again');
+  playAgain.onclick = () => {
     let mainMenu = document.getElementById('main-menu');
     mainMenu.style.display = 'none';
     GAME_STATUS = 'retry';
@@ -312,8 +320,10 @@ Ammo().then(function (Ammo) {
       let pos = new THREE.Vector3();
       let quat = new THREE.Quaternion();
 
-      // Initial ball position;;;
+      // Initial ball position
       pos.set(54.134429931640625, 16.012664794921875, 153.05307006835938);
+      // Endpoint position
+      // pos.set(731.6364135742188, 13.190799713134766, 873.3243408203125);
       quat.set(0, 0, 0, 1);
       const BALL_SIZE = 2
       // textrue.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -649,17 +659,34 @@ Ammo().then(function (Ammo) {
       pos.set(54.134429931640625, 16.012664794921875, 153.05307006835938);
       ball.position.copy(pos);
       GAME_STATUS = 'start';
+      scene.remove(ball);
       ball = null;
       createBall();
     }
 
-    if (ball && ball.position.y < -200 && GAME_STATUS === 'start') {
+    // {x: 731.6364135742188, y: -13.190799713134766, z: 873.3243408203125}
+    if (ball &&
+      ball.position.x < 735 && ball.position.x > 730 &&
+      ball.position.y < -10 && ball.position.y > -15 &&
+      ball.position.z < 875 && ball.position.z > 870 &&
+      GAME_STATUS === 'start') {
+      console.log(ball.position);
+      GAME_STATUS = 'win';
+      let mainMenu = document.getElementById('main-menu');
+      mainMenu.style.display = 'block';
+      document.querySelector('.flex-w').style.display = 'none';
+      document.querySelector('.lose').style.display = 'none';
+      document.querySelector('.win').style.display = 'block';
+    }
+
+    if (ball && ball.position.y < -100 && GAME_STATUS === 'start') {
       console.log(ball.position);
       GAME_STATUS = 'lose';
       let mainMenu = document.getElementById('main-menu');
       mainMenu.style.display = 'block';
       document.querySelector('.flex-w').style.display = 'none';
       document.querySelector('.lose').style.display = 'block';
+      document.querySelector('.win').style.display = 'none';
     }
 
     if (debugDrawer && DEBUG_MODE) debugDrawer.update();
